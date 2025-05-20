@@ -46,6 +46,27 @@
         background-color: #fafafa;
         border-radius: .25rem;
     }
+    .rationale-text {
+      white-space: normal; /* Allow wrapping */
+      word-break: break-word; /* Break words if necessary */
+    }
+    .esg-details {
+      display: flex; /* Helps align badge and text */
+      align-items: flex-start; /* Align items to the start of the flex line */
+      margin-top: 0.25rem; /* Consistent with original slds-m-top_xx-small */
+    }
+    .esg-score-badge {
+      margin-right: 0.25rem; /* Add some space between badge and text */
+      flex-shrink: 0; /* Prevent badge from shrinking */
+      /* Inherits display from .slds-badge which is inline-block */
+    }
+    .esg-impact-text {
+      white-space: normal;
+      word-break: break-word;
+      display: inline; /* Allow it to flow with the badge, flex handles layout */
+      flex: 1; /* Allow text to take remaining space and wrap */
+      line-height: 1.3; /* Adjust if vertical alignment with badge text is off */
+    }
   </style>
 </head>
 <body>
