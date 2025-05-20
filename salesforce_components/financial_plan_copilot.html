@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Financial Plan Copilot</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .metric{font-size:1.2rem;font-weight:700;}
+    .good{color:#28a745;}.warn{color:#f2b01e;}.bad{color:#c23934;}
+    .chat-box{border:1px solid #d8dde6;border-radius:.25rem;background:#fff;height:320px;overflow-y:auto;padding:.75rem;}
+    .bubble{padding:.5rem .75rem;border-radius:12px;margin-bottom:.5rem;max-width:75%;}
+    .user{background:#1589ee;color:#fff;margin-left:auto;}
+    .bot{background:#f3f2f2;border:1px solid #e0e0e0;}
+    .typing{display:inline-block;width:6px;height:6px;border-radius:50%;background:#999;animation:blink 1s infinite alternate;}
+    @keyframes blink{to{opacity:.2;}}
+  </style>
+</head>
+<body>
+  <!-- Plan Snapshot -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-goals"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#goals"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">John Doe – Plan Snapshot (Live)</h2><p class="slds-text-body_small">Data from Salesforce + MoneyGuide • Updated <span id="upd"></span></p></div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="prob"></div><div>Retirement Success</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="fund"></div><div>College Funded</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="netWorth"></div><div>Net Worth</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="risk"></div><div>Portfolio Risk Score</div></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Copilot Chat -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><div class="slds-media slds-media_center"><div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-bot"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#bot"></use></svg></span></div><div class="slds-media__body"><h2 class="slds-card__header-title">Financial Plan Copilot (powered by FactSet Mercury & Atlas)</h2></div></div></header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="chat-box" id="log"></div>
+      <div class="slds-m-top_small"><input type="text" class="slds-input" id="ask" placeholder="Ask a question… (Enter)" onkeydown="if(event.key==='Enter')query()" /></div>
+      <div class="slds-m-top_small">
+        <button class="slds-button slds-button_neutral" onclick="quick('Summarize John Doe’s financial plan and highlight any concerns.')">Plan Summary</button>
+        <button class="slds-button slds-button_neutral" onclick="quick('How did John’s portfolio perform YTD vs S&P 500?')">YTD vs S&P</button>
+        <button class="slds-button slds-button_neutral" onclick="quick('Highest closing price of Apple in last 12 months?')">AAPL High</button>
+      </div>
+    </div>
+  </article>
+
+<script>
+  // Demo snapshot data
+  const snapshot={prob:78,fund:90,net:'$2.4M',risk:42};
+  document.getElementById('prob').textContent=snapshot.prob+'%'; document.getElementById('prob').className='metric '+(snapshot.prob>=85?'good':snapshot.prob>=75?'warn':'bad');
+  document.getElementById('fund').textContent=snapshot.fund+'%';
+  document.getElementById('netWorth').textContent=snapshot.net;
+  document.getElementById('risk').textContent=snapshot.risk;
+  document.getElementById('upd').textContent=new Date().toLocaleString();
+
+  // chat helpers
+  const log=document.getElementById('log');
+  function bubble(text,cls){const b=document.createElement('div');b.className='bubble '+cls;b.innerHTML=text.replace(/\n/g,'<br>');log.appendChild(b);log.scrollTop=log.scrollHeight;}
+
+  async function mercuryCall(q){
+    // Placeholder for real Mercury API integration
+    // In production, you would fetch('/services/apexrest/mercury?q='+encodeURIComponent(q))
+    return new Promise(res=>setTimeout(()=>{
+      if(q.toLowerCase().includes('summarize')){
+        res(`John has a **78% retirement success probability**, slightly below the 85% target. Shortfall driven by a $120k dip in his 401(k) from recent market declines. Suggest: increase savings by **$5,000/y** or delay retirement by **6 months**. His college goal is **90% funded**, on track. Portfolio risk score **42/100** aligns with his moderate profile.`);
+      } else if(q.toLowerCase().includes('ytd')){
+        res(`John's portfolio is **+6.8% YTD** vs **+9.4% for the S&P 500**. Underweight in large‑cap tech explains 70% of the lag.`);
+      } else if(q.toLowerCase().includes('highest closing price')||q.toLowerCase().includes('apple')){
+        res(`Apple's highest close in the last 12 months was **$225.15 on 2025‑03‑14**.`);
+      } else {
+        res(`Here’s the insight for **${q}** (demo stub – Mercury would return real‑time data and narrative).`);
+      }
+    },700));
+  }
+
+  function query(){const inp=document.getElementById('ask');const q=inp.value.trim();if(!q)return;inp.value='';bubble(q,'user');const typing=document.createElement('div');typing.className='bubble bot';typing.innerHTML='<span class="typing"></span><span class="typing"></span><span class="typing"></span>';log.appendChild(typing);log.scrollTop=log.scrollHeight;mercuryCall(q).then(a=>{typing.remove();bubble(a,'bot');});}
+  function quick(q){document.getElementById('ask').value=q;query();}
+</script>
+</body>
+</html>

@@ -269,6 +269,12 @@
                 name: 'Real‑Time Alerts & Modeling',
                 path: 'salesforce_components/real_time_alerts_modeling.html',
                 description: 'Automated Real-Time Alerts & Modeling: With Salesforce\\\'s automation and AI, you can set up triggers that respond to data changes in ways MGP alone cannot. For example, if a portfolio\\\'s value changes enough to alter the plan\\\'s probability of success, Salesforce (via Agentforce) could automatically recompute a quick projection or at least alert the advisor. AI agents excel at monitoring data and flagging issues in real time. In fact, modern AI can “constantly track portfolios and economic conditions, flagging potential shortfalls based on market performance and suggesting adjustments when spending patterns shift”. Imagine a Salesforce flow that checks each morning for any client whose goal funding percentage dropped below, say, 80%. It could then notify the advisor or even generate a suggested action plan (e.g. “Client\\\'s retirement goal now underfunded – consider increasing monthly savings by $200”). MoneyGuidePro might show this situation only at the next plan review, whereas Salesforce\\\'s real-time vigilance goes a step further, enabling truly dynamic planning.'
+            },
+            {
+                id: 'financial_plan_copilot',
+                name: 'Financial Plan Copilot',
+                path: 'salesforce_components/financial_plan_copilot.html',
+                description: 'Advisor’s Intelligent Assistant: Build an agent (perhaps called “Financial Plan Copilot”) that integrates with Salesforce data and MoneyGuide outputs. Using Prompt Builder, you can ground the agent in the client’s financial data from CRM (accounts, goals, plan summaries) to ensure accurate responses. This agent could answer advisors’ natural language questions like, “Summarize John Doe’s financial plan and highlight any concerns”. The Atlas Reasoning Engine can break down such a request: retrieve John’s goals and plan metrics, compare current vs target values, and generate a narrative answer. For example, the agent might respond: “John has a 78% probability of retirement success at age 65, slightly below the 85% target ￼. The shortfall is mainly due to recent market declines reducing his 401(k) balance. I suggest discussing either postponing retirement to 66 or increasing his annual savings by $5,000. Additionally, his college funding goal is on track at 90% funded.” This kind of instant analysis saves the advisor time combing through reports. It’s feasible because Agentforce can use real-time data adaptation and actions across Salesforce records ￼, and even call external APIs if needed (e.g., to run a quick projection).'
             }
         ];
 
@@ -325,7 +331,8 @@
                     'live_portfolio_dashboard',
                     'transactional_behavioral_insights',
                     'factset_mercury_assistant',
-                    'real_time_alerts_modeling'
+                    'real_time_alerts_modeling',
+                    'financial_plan_copilot'
                 ]
             }
         ];
