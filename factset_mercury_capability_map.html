@@ -13,6 +13,13 @@
     .advisor{background:#4bca81;}.client{background:#1589ee;}
     .filter-btn.active{background:#0070d2;color:#fff;}
     .code-btn{font-size:.6rem;padding:.1rem .4rem;margin-left:.3rem;}
+    .tooltip-trigger-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .slds-popover_tooltip .slds-popover__body { /* Ensure body text wraps */
+      white-space: normal;
+    }
   </style>
 </head>
 <body class="slds-scope">
@@ -37,13 +44,56 @@
   <div class="slds-card slds-m-bottom_large">
     <div class="slds-card__body slds-p-around_medium filter-bar">
       <span class="slds-text-title_bold slds-m-right_small">Filter by Mercury Capability:</span>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="nlq">NL Q&A</button>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="attribution">Attribution</button>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="risk">Risk</button>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="events">Events</button>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="scenario">Scenario</button>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="content">Content Gen</button>
-      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="realtime">Real‑Time</button>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="nlq" aria-describedby="tooltip-nlq">NL Q&A</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-nlq" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="attribution" aria-describedby="tooltip-attribution">Attribution</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-attribution" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="risk" aria-describedby="tooltip-risk">Risk</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-risk" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="events" aria-describedby="tooltip-events">Events</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-events" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="scenario" aria-describedby="tooltip-scenario">Scenario</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-scenario" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="content" aria-describedby="tooltip-content">Content Gen</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-content" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
+      <div class="tooltip-trigger-wrapper slds-m-right_x-small">
+        <button class="slds-button slds-button_neutral filter-btn" data-filter="realtime" aria-describedby="tooltip-realtime">Real‑Time</button>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom" role="tooltip" id="tooltip-realtime" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); width: 280px; z-index: 10;">
+          <div class="slds-popover__body"></div>
+        </div>
+      </div>
+      
       <button id="clear" class="slds-button slds-button_outline-brand slds-m-left_medium">Clear</button>
     </div>
   </div>
@@ -72,6 +122,44 @@ function render(){grid.innerHTML='';data.forEach(p=>{
  grid.appendChild(card);});}
 function capLabel(k){return {nlq:'NL Q&A',attribution:'Attribution',risk:'Risk',events:'Events',scenario:'Scenario',content:'Content',realtime:'Real‑Time'}[k]||k;}
 render();
+
+// === Tooltip Descriptions & Logic ===
+const tooltipDescriptions = {
+  nlq: "Mercury’s conversational LLM that lets advisors or clients ask plain-English questions (e.g., “How did my portfolio do vs. the S&P 500?”) and instantly receive data-backed answers.",
+  attribution: "Analytics that decompose a portfolio’s return into factors such as asset allocation, security selection, sector bets, and currency effects. Used for “why did I outperform/underperform?” explanations.",
+  risk: "Real-time risk metrics (volatility, Value-at-Risk, beta, downgrade alerts, ESG score shifts) and rule-based alerts when exposure breaches thresholds.",
+  events: "Continuous scanning of news, filings, and market data for events that may impact a client (e.g., liquidity events, earnings surprises, corporate actions) and surfacing them in Salesforce.",
+  scenario: "Tools to simulate “what-if” market scenarios (rate shocks, recessions, sector crashes) and forecast how client portfolios or goals would be affected.",
+  content: "Generative AI that drafts narrative commentary, market recaps, or personalized report sections using Mercury’s data plus language models—saving advisors writing time.",
+  realtime: "Up-to-the-second quotes, price histories, and index data streams that power live dashboards, tickers, and instant performance calculations."
+};
+
+document.querySelectorAll('.tooltip-trigger-wrapper').forEach(trigger => {
+  const button = trigger.querySelector('.filter-btn');
+  if (!button) return; // Should not happen with current HTML structure
+  
+  const tooltip = trigger.querySelector('.slds-popover_tooltip');
+  if (!tooltip) return; // Should not happen
+
+  const filterKey = button.dataset.filter;
+  const tooltipBody = tooltip.querySelector('.slds-popover__body');
+
+  if (tooltipBody && tooltipDescriptions[filterKey]) {
+    tooltipBody.textContent = tooltipDescriptions[filterKey];
+  }
+
+  const showTooltip = () => { tooltip.style.display = 'block'; };
+  const hideTooltip = () => { tooltip.style.display = 'none'; };
+
+  button.addEventListener('mouseenter', showTooltip);
+  button.addEventListener('focus', showTooltip);
+  button.addEventListener('mouseleave', hideTooltip);
+  button.addEventListener('blur', hideTooltip);
+  
+  tooltip.addEventListener('mouseenter', showTooltip); // Keep tooltip visible if mouse enters it
+  tooltip.addEventListener('mouseleave', hideTooltip); // Hide tooltip if mouse leaves it
+});
+
 // === Filter logic ===
 const btns=[...document.querySelectorAll('.filter-btn')];
 btns.forEach(b=>b.onclick=()=>{b.classList.toggle('active');filter();});
