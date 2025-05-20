@@ -1,30 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>360° Client Dashboard Prototype</title>
-  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <meta charset="UTF-8" />
+  <title>Unified 360° Client View</title>
+  <link rel="stylesheet" href="https://www.lightningdesignsystem.com/assets/styles/salesforce-lightning-design-system.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body{padding:1rem;background:#f3f2f2;}
     .slds-card{margin-bottom:1.5rem;}
+    .metric{font-size:1.4rem;font-weight:700;}
+    canvas{max-width:100%;}
   </style>
 </head>
 <body>
-  <!-- 1. Unified 360° Client View -->
+  <!-- 360 Header -->
   <article class="slds-card">
     <header class="slds-card__header slds-p-around_medium">
       <div class="slds-media slds-media_center">
-        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-contact"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#contact"></use></svg></span></div>
-        <div class="slds-media__body"><h2 class="slds-card__header-title slds-truncate">360° Client Dashboard</h2><p class="slds-text-body_small">Positions · Tasks · Communications · Analytics</p></div>
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-contact"><svg class="slds-icon slds-icon_small"><use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#contact"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">John Doe – Unified 360° Dashboard</h2><p class="slds-text-body_small">Live brokerage data • CRM notes • Planning insight • Mercury analytics</p></div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+    <div class="slds-card__body slds-p-around_medium">
       <div class="slds-grid slds-wrap slds-gutters_medium">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><h3 class="slds-text-title_caps">Snapshot</h3><ul class="slds-list_dotted"><li><strong>AUM:</strong> $12.4M</li><li><strong>Risk Score:</strong> 42 (Moderate)</li><li><strong>Last Contact:</strong> 03 May 2025</li><li><strong>Drift:</strong> 4% vs Policy</li></ul></div>
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12"><h3 class="slds-text-title_caps">Recent Performance</h3><img src="https://dummyimage.com/300x140/ffffff/808080&text=Chart" alt="chart placeholder" style="width:100%"></div>
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12"><h3 class="slds-text-title_caps">Open Tasks</h3><ul class="slds-has-dividers_around-space"><li>Rebalancing Review – Due Today</li><li>Send Q1 Report – Due Fri</li></ul></div>
+        <!-- KPI Column -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="metric" id="aum"></div><div>Total AUM</div>
+          <div class="slds-m-top_medium"><div class="metric" id="ytd"></div><div>YTD Return</div></div>
+          <div class="slds-m-top_medium"><div class="metric" id="risk"></div><div>Risk Score</div></div>
+        </div>
+        <!-- Chart Column -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+          <canvas id="perfChart" height="140"></canvas>
+        </div>
+        <!-- Task Column -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <h3 class="slds-text-title_caps">Open Tasks</h3>
+          <ul class="slds-has-dividers_around-space" id="taskList"></ul>
+        </div>
       </div>
     </div>
   </article>
+
+<script>
+  // Synthetic data
+  const months=['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+  const values=[925,940,955,910,980,1005,1020,1035,1060,1040,1080,1115];
+  const aum=values[values.length-1];
+  const ytd=((aum-values[6])/values[6]*100).toFixed(1); // Jan vs Dec baseline
+  document.getElementById('aum').textContent='$'+(aum/10).toFixed(1)+'M';
+  document.getElementById('ytd').textContent=(ytd>=0?'+':'')+ytd+'%';
+  document.getElementById('risk').textContent='42 (Moderate)';
+
+  // Chart.js line chart
+  new Chart(document.getElementById('perfChart').getContext('2d'),{
+    type:'line',
+    data:{labels:months,datasets:[{label:'Portfolio Value ($K)',data:values,fill:true,tension:.3}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:false}}}
+  });
+
+  // tasks
+  const tasks=['Rebalancing Review – Due Today','Send Q2 Report – Due Fri','Follow up on Mercury tech briefing'];
+  const list=document.getElementById('taskList');
+  tasks.forEach(t=>{const li=document.createElement('li');li.textContent=t;list.appendChild(li);});
+</script>
 </body>
 </html>
