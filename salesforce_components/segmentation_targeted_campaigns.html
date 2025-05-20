@@ -2,62 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Segmentation & Targeted Campaigns Prototype</title>
+  <title>Segmentation & Targeted Campaigns – Mercury-Powered</title>
   <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
   <style>
     body{padding:1rem;background:#f3f2f2;}
     .slds-card{margin-bottom:1.5rem;}
+    .badge-green{background:#6ec664;color:#fff;}
+    .content-box{border:1px solid #d8dde6;border-radius:.25rem;background:#fff;padding:.75rem;min-height:140px;}
+    .code{background:#f3f2f2;border:1px solid #d8dde6;border-radius:4px;padding:.5rem;font-family:monospace;font-size:.8rem;white-space:pre-wrap;}
   </style>
 </head>
 <body>
-
-  <!-- 4. Segmentation & Targeted Campaigns -->
+  <!-- Segmentation & Campaigns Card -->
   <article class="slds-card">
     <header class="slds-card__header slds-p-around_medium">
       <div class="slds-media slds-media_center">
-        <div class="slds-media__figure">
-          <span class="slds-icon_container slds-icon-standard-goal" title="Segmentation">
-            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#goal"></use></svg>
-          </span>
-        </div>
-        <div class="slds-media__body">
-          <h2 class="slds-card__header-title slds-truncate">Segmentation & Targeted Campaigns</h2>
-          <p class="slds-text-body_small">Data‑driven marketing with ROI tracking</p>
-        </div>
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-goal"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#goal"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">Mercury-Powered Targeted Campaign Builder</h2><p class="slds-text-body_small">Segment clients & generate personalized content via FactSet Mercury API</p></div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+    <div class="slds-card__body slds-p-around_medium">
+      <!-- Controls -->
       <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
-          <div class="slds-form-element">
-            <label class="slds-form-element__label" for="segSelect">Segment</label>
-            <div class="slds-form-element__control"><div class="slds-select_container"><select class="slds-select" id="segSelect"><option value="tech">Tech Professionals</option><option value="retirees">Pre‑Retirees</option><option value="entrepreneurs">Entrepreneurs</option></select></div></div>
-          </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <div class="slds-form-element"><label class="slds-form-element__label" for="segSelect">Choose Segment</label><div class="slds-form-element__control"><div class="slds-select_container"><select class="slds-select" id="segSelect" onchange="updateSeg()"><option value="tech">Mid-Career Tech Professionals</option><option value="retirees">Pre-Retirees (<5y)</option><option value="founders">Recent Liquidity Event</option></select></div></div></div>
         </div>
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
-          <button class="slds-button slds-button_brand" onclick="launchCampaign()">Launch Campaign</button>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom"><button class="slds-button slds-button_brand" onclick="launchCampaign()">Launch Campaign</button></div>
+      </div>
+
+      <!-- Segment Metrics & Mercury Content -->
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+            <tbody id="metricBody"></tbody>
+          </table>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+          <h3 class="slds-text-heading_small">Mercury Content Suggestions</h3>
+          <div class="content-box" id="contentBox"><em>Select a segment to fetch insights…</em></div>
+          <div class="slds-m-top_small"><button class="slds-button slds-button_neutral" onclick="fetchContent()">Refresh with Mercury</button></div>
         </div>
       </div>
-      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
-        <thead><tr><th>Segment</th><th>Size</th><th>Open Rate</th><th>CTR</th><th>Next Step</th></tr></thead>
-        <tbody id="segTable"></tbody>
-      </table>
     </div>
   </article>
 
-  <!-- Templates -->
-  <template id="segRow"><tr><td class="seg"></td><td class="size"></td><td class="open"></td><td class="ctr"></td><td><button class="slds-button slds-button_neutral">View Leads</button></td></tr></template>
+<script>
+  // Segment metrics & mock Mercury responses
+  const segData={
+    tech:{size:150,open:'42%',ctr:'8%',mercury:`**Trending Topics:**\n• Equity compensation tax planning (ISO vs NSO).\n• AI sector outlook – NVDA, MSFT leading gains.\n• Tech IPO pipeline revival Q3 2025.\n\n**Suggested Content:**\n1. Webinar: "Monetizing Your Stock Options – 3 Mistakes to Avoid"\n2. Email series: Monthly AI market recap (FactSet Tech Index + key data).`},
+    retirees:{size:210,open:'38%',ctr:'6%',mercury:`**Trending Topics:**\n• Real-time income strategies amid rate volatility.\n• Social Security COLA projections 2026.\n\n**Suggested Content:**\n1. Guide: "Maximizing Income with Bond Ladders"\n2. Video: "Navigating Medicare IRMAA Brackets"`},
+    founders:{size:60,open:'45%',ctr:'12%',mercury:`**Trending Topics:**\n• Post-liquidity investment diversification.\n• Qualified Small Business Stock (QSBS) planning.\n\n**Suggested Content:**\n1. Roundtable invite: "Managing Wealth After an Exit"\n2. Whitepaper: "Tax Deferral with Opportunity Zones – 2025 Update"`}
+  };
 
-  <script>
-    // Demo datasets
-    const segs=[{seg:'Tech Professionals',size:150,open:42,ctr:8},{seg:'Entrepreneurs',size:80,open:38,ctr:6}];
+  function updateSeg(){const seg=document.getElementById('segSelect').value;const m=document.getElementById('metricBody');m.innerHTML='';const d=segData[seg];[['Segment Size',d.size],['Open Rate',d.open],['Click-Through',d.ctr]].forEach(([k,v])=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${k}</td><td>${v}</td>`;m.appendChild(tr);});document.getElementById('contentBox').innerHTML='<em>Click “Refresh with Mercury” to fetch latest market-driven content ideas…</em>';}
+  updateSeg();
 
-    // Segmentation table
-    const sBody=document.getElementById('segTable');
-    const sTmpl=document.getElementById('segRow').content;
-    segs.forEach(r=>{const row=sTmpl.cloneNode(true);row.querySelector('.seg').textContent=r.seg;row.querySelector('.size').textContent=r.size;row.querySelector('.open').textContent=r.open+'%';row.querySelector('.ctr').textContent=r.ctr+'%';sBody.appendChild(row);});
+  function fetchContent(){const seg=document.getElementById('segSelect').value;const box=document.getElementById('contentBox');box.innerHTML='<span class="slds-spinner slds-spinner_small slds-spinner_inline" role="status"><span class="slds-assistive-text">Loading</span><div class="slds-spinner__dot-a"></div><div class="slds-spinner__dot-b"></div></span> Fetching from FactSet Mercury…';setTimeout(()=>{
+    // simulate Mercury API response
+    box.innerHTML=segData[seg].mercury.replace(/\n/g,'<br>');
+  },700);}
 
-    function launchCampaign(){alert('Campaign launched for '+document.getElementById('segSelect').value);}
-  </script>
+  function launchCampaign(){alert('Campaign launched! Performance metrics will update in real time.');}
+</script>
 </body>
 </html>
