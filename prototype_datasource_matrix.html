@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Prototype Data‑Source Matrix</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.25.6/styles/salesforce-lightning-design-system.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="slds-assets/styles/salesforce-lightning-design-system.min.css" />
   <style>
     body{padding:1rem;background:#f3f2f2;font-family:'Salesforce Sans',sans-serif;}
     .ds-badge{background:#9faab5;color:#fff;padding:.15rem .45rem;border-radius:.25rem;font-size:.65rem;margin-right:.25rem;white-space:nowrap;}
@@ -18,7 +18,7 @@
       <div class="slds-page-header__col-title">
         <div class="slds-media">
           <div class="slds-media__figure">
-            <span class="slds-icon_container slds-icon-standard-filter" title="data"><svg class="slds-icon slds-icon_small"><use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#filter"></use></svg></span>
+            <span class="slds-icon_container slds-icon-standard-filter" title="data"><svg class="slds-icon slds-icon_small"><use xlink:href="slds-assets/icons/standard-sprite/svg/symbols.svg#filter"></use></svg></span>
           </div>
           <div class="slds-media__body">
             <h1 class="slds-page-header__title">Prototype Coverage by Core Data Sources</h1>
@@ -47,12 +47,12 @@
 <script>
 // Minimal subset – extend with full list & accurate tags
 const prototypes=[
-  {name:'Live Portfolio – Advisor Dashboard',link:'salesforce_components/live_portfolio_dashboard.html',ds:['positions','transactions','performance','factset'],desc:'Real‑time holdings, performance & Mercury risk context.'},
-  {name:'Transactional & Behavioral Insights',link:'salesforce_components/transactional_behavioral_insights.html',ds:['transactions','performance'],desc:'Cash‑flow analytics vs. plan.'},
-  {name:'Real‑Time Portfolio Risk Alerts',link:'salesforce_components/real_time_portfolio_risk_alerts.html',ds:['positions','performance','factset'],desc:'Mercury risk analytics feed into Salesforce alerts.'},
-  {name:'AI Research & Decision Support',link:'salesforce_components/ai_research_assistant.html',ds:['factset','performance'],desc:'Natural‑language Q&A & attribution with Mercury.'},
-  {name:'Workflow Automation & Tasks',link:'salesforce_components/workflow_automation_center.html',ds:['positions','transactions','factset'],desc:'Flows triggered from data changes.'},
-  {name:'360° Client Dashboard',link:'salesforce_components/unified_client_view.html',ds:['positions','transactions','performance','factset'],desc:'Unified view with Mercury insights.'}
+  {name:'Live Portfolio – Advisor Dashboard',link:'index.html?prototype=live_portfolio_dashboard',ds:['positions','transactions','performance','factset'],desc:'Real‑time holdings, performance & Mercury risk context.'},
+  {name:'Transactional & Behavioral Insights',link:'index.html?prototype=transactional_behavioral_insights',ds:['transactions','performance'],desc:'Cash‑flow analytics vs. plan.'},
+  {name:'Real‑Time Portfolio Risk Alerts',link:'index.html?prototype=real_time_portfolio_risk_alerts',ds:['positions','performance','factset'],desc:'Mercury risk analytics feed into Salesforce alerts.'},
+  {name:'AI Research & Decision Support',link:'index.html?prototype=ai_research_assistant',ds:['factset','performance'],desc:'Natural‑language Q&A & attribution with Mercury.'},
+  {name:'Workflow Automation & Tasks',link:'index.html?prototype=workflow_automation_center',ds:['positions','transactions','factset'],desc:'Flows triggered from data changes.'},
+  {name:'360° Client Dashboard',link:'index.html?prototype=unified_client_view',ds:['positions','transactions','performance','factset'],desc:'Unified view with Mercury insights.'}
 ];
 function label(key){return {positions:'Positions',transactions:'Transactions',performance:'Performance',factset:'FactSet Mercury'}[key];}
 const grid=document.getElementById('grid');

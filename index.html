@@ -429,6 +429,27 @@
         backLinkLi.appendChild(backLinkA);
         if (navList) navList.appendChild(backLinkLi);
 
+        // Add link to Mercury Capability Map
+        const capabilityMapLi = document.createElement('li');
+        capabilityMapLi.classList.add('slds-nav-vertical__item');
+        const capabilityMapLink = document.createElement('a');
+        capabilityMapLink.classList.add('slds-nav-vertical__action');
+        capabilityMapLink.href = 'factset_mercury_capability_map.html';
+        capabilityMapLink.textContent = 'Mercury Capability Map';
+        capabilityMapLink.style.marginBottom = '0.5rem'; // Optional: add some spacing
+        capabilityMapLi.appendChild(capabilityMapLink);
+        if (navList) navList.appendChild(capabilityMapLi);
+
+        // Add link to Data Source Matrix
+        const dataSourceMatrixLi = document.createElement('li');
+        dataSourceMatrixLi.classList.add('slds-nav-vertical__item');
+        const dataSourceMatrixLink = document.createElement('a');
+        dataSourceMatrixLink.classList.add('slds-nav-vertical__action');
+        dataSourceMatrixLink.href = 'prototype_datasource_matrix.html';
+        dataSourceMatrixLink.textContent = 'Data Source Matrix';
+        dataSourceMatrixLink.style.marginBottom = '1rem'; // Optional: add some spacing before categories
+        dataSourceMatrixLi.appendChild(dataSourceMatrixLink);
+        if (navList) navList.appendChild(dataSourceMatrixLi);
 
         categories.forEach(category => {
             const categoryHeader = document.createElement('h3');
