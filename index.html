@@ -263,6 +263,12 @@
                 name: 'FactSet Mercury Assistant',
                 path: 'salesforce_components/factset_mercury_assistant.html',
                 description: 'FactSet Mercury AI Capabilities: The FactSet Mercury API adds a generative AI layer on top of rich financial data. Mercury is a conversational AI (LLM) that can answer natural language queries about market data, companies, and more. Integrated into Salesforce (e.g. via an embedded chat or Agentforce action), Mercury can do things MGP cannot – such as on-the-fly research or answering ad-hoc questions with the latest data. For instance, an advisor could ask, “What’s the YTD performance of Client A’s portfolio vs S&P 500?” and Mercury (with access to real-time pricing and portfolio data) could instantly respond with figures and context. Or a client could query via a chatbot, “Can I still retire at 65 if my portfolio drops another 10%?” – Mercury might leverage current data and perhaps even call MoneyGuidePro’s projection API to provide a nuanced answer. MoneyGuidePro doesn’t offer such an on-demand Q&A interface; it requires the advisor to manually input scenario changes. Salesforce + Mercury goes beyond by providing AI-driven analysis in real time. FactSet\\\'s AI can incorporate “comprehensive financial fundamentals and pricing data”, enabling detailed answers about stocks or markets. This means advisors have a research assistant at their fingertips in CRM. Additionally, Mercury\\\'s conversational API can surface insights like “the highest closing stock price of a holding or key trends impacting a company” just by asking – tasks that would require manual research outside Salesforce. This empowers advisors to be more responsive and informed without leaving their workflow.'
+            },
+            {
+                id: 'real_time_alerts_modeling',
+                name: 'Real‑Time Alerts & Modeling',
+                path: 'salesforce_components/real_time_alerts_modeling.html',
+                description: 'Automated Real-Time Alerts & Modeling: With Salesforce\\\'s automation and AI, you can set up triggers that respond to data changes in ways MGP alone cannot. For example, if a portfolio\\\'s value changes enough to alter the plan\\\'s probability of success, Salesforce (via Agentforce) could automatically recompute a quick projection or at least alert the advisor. AI agents excel at monitoring data and flagging issues in real time. In fact, modern AI can “constantly track portfolios and economic conditions, flagging potential shortfalls based on market performance and suggesting adjustments when spending patterns shift”. Imagine a Salesforce flow that checks each morning for any client whose goal funding percentage dropped below, say, 80%. It could then notify the advisor or even generate a suggested action plan (e.g. “Client\\\'s retirement goal now underfunded – consider increasing monthly savings by $200”). MoneyGuidePro might show this situation only at the next plan review, whereas Salesforce\\\'s real-time vigilance goes a step further, enabling truly dynamic planning.'
             }
         ];
 
@@ -318,7 +324,8 @@
                 prototypeIds: [
                     'live_portfolio_dashboard',
                     'transactional_behavioral_insights',
-                    'factset_mercury_assistant'
+                    'factset_mercury_assistant',
+                    'real_time_alerts_modeling'
                 ]
             }
         ];

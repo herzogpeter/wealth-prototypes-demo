@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Real‑Time Alerts & Modeling</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .kpi{font-size:1.5rem;font-weight:700;}
+    .badge-red{background:#ea001e;color:#fff;}
+    .badge-yellow{background:#ffb75d;color:#000;}
+    .badge-green{background:#6ec664;color:#fff;}
+    .suggest{font-size:.8rem;color:#444;}
+  </style>
+</head>
+<body>
+  <!-- Overnight Scan Summary -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-task2"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#task2"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">Daily Plan Health Scan (Agentforce)</h2><p class="slds-text-body_small">Last run: <span id="runTime"></span></p></div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="kpi" id="atRisk"></div><div>Plans Below 80% Funding</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="kpi" id="avgDrop"></div><div>Avg Funding Drop</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="kpi" id="tasksGen"></div><div>Action Plans Created</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><button class="slds-button slds-button_brand" onclick="rerunScan()">Run Scan Now</button></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Alert Table -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Today's Alerts & Suggested Actions</h2></header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-scrollable_y" style="max-height:320px;">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout" role="grid">
+          <thead><tr><th>Client</th><th>Goal</th><th>Funding %</th><th>Δ vs Yesterday</th><th>Risk</th><th>Suggested Action</th><th></th></tr></thead>
+          <tbody id="alertBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </article>
+
+  <!-- Modal -->
+  <section class="slds-modal" tabindex="-1" role="dialog" id="modal" style="display:none;" aria-modal="true">
+    <div class="slds-modal__container" style="max-width:50rem;">
+      <header class="slds-modal__header"><h2 class="slds-text-heading_medium" id="modalHead">Action Plan</h2>
+        <button class="slds-button slds-button_icon slds-modal__close" onclick="closeModal()"><svg class="slds-button__icon slds-button__icon_large"><use xlink:href="../slds-assets/icons/utility-sprite/svg/symbols.svg#close"></use></svg></button>
+      </header>
+      <div class="slds-modal__content slds-p-around_medium" id="modalBody"></div>
+      <footer class="slds-modal__footer"><button class="slds-button slds-button_neutral" onclick="closeModal()">Cancel</button><button class="slds-button slds-button_brand" id="createBtn">Create Action Plan</button></footer>
+    </div>
+  </section>
+  <div class="slds-backdrop" id="backdrop" style="display:none;"></div>
+
+  <template id="rowTmpl"><tr><td class="client"></td><td class="goal"></td><td class="fund"></td><td class="delta"></td><td><span class="risk slds-badge"></span></td><td class="suggest"></td><td><button class="slds-button slds-button_neutral" onclick="openPlan(this)">Review</button></td></tr></template>
+
+<script>
+  // Mock scan data
+  const alerts=[
+    {c:'Jane Doe',g:'Retirement',f:78,d:'-5%',risk:'High',msg:'Increase monthly savings by $200 or retire 6m later.'},
+    {c:'John Smith',g:'College',f:82,d:'-3%',risk:'Med',msg:'Move $5k from cash to 529 fund.'},
+    {c:'Darcy Family',g:'Vacation Home',f:68,d:'-7%',risk:'High',msg:'Consider delaying purchase or reallocating equities.'}
+  ];
+  const riskCls={High:'badge-red',Med:'badge-yellow',Low:'badge-green'};
+
+  function populate(){
+    document.getElementById('runTime').textContent=new Date().toLocaleString();
+    document.getElementById('atRisk').textContent=alerts.filter(a=>a.f<80).length;
+    const avg=alerts.reduce((s,a)=>s+parseFloat(a.d),0)/alerts.length;document.getElementById('avgDrop').textContent=avg.toFixed(1)+'%';
+    document.getElementById('tasksGen').textContent=0;
+    const body=document.getElementById('alertBody');body.innerHTML='';
+    const tmpl=document.getElementById('rowTmpl').content;
+    alerts.forEach(a=>{const r=tmpl.cloneNode(true);
+      r.querySelector('.client').textContent=a.c;
+      r.querySelector('.goal').textContent=a.g;
+      r.querySelector('.fund').textContent=a.f+'%';
+      r.querySelector('.delta').textContent=a.d;
+      const rb=r.querySelector('.risk');rb.textContent=a.risk;rb.classList.add(riskCls[a.risk]);
+      r.querySelector('.suggest').textContent=a.msg;
+      body.appendChild(r);
+    });
+  }
+
+  function openPlan(btn){
+    const row=btn.closest('tr');
+    const name=row.children[0].textContent;
+    const goal=row.children[1].textContent;
+    const msg=row.children[5].textContent;
+    document.getElementById('modalHead').textContent=`Action Plan – ${name}`;
+    document.getElementById('modalBody').innerHTML=`<p><strong>Goal:</strong> ${goal}</p><p><strong>Suggested Adjustment:</strong> ${msg}</p><p class="slds-m-top_small suggest">Agentforce can automatically create a Salesforce Action Plan with tasks for contribution changes, client outreach, and plan recalc.</p>`;
+    document.getElementById('createBtn').onclick=()=>{alert('Action Plan created in Salesforce!');closeModal();document.getElementById('tasksGen').textContent=parseInt(document.getElementById('tasksGen').textContent)+1;};
+    document.getElementById('modal').style.display='block';document.getElementById('backdrop').style.display='block';
+  }
+  function closeModal(){document.getElementById('modal').style.display='none';document.getElementById('backdrop').style.display='none';}
+  function rerunScan(){alert('Scan triggered – results will refresh shortly.');}
+  populate();
+</script>
+</body>
+</html>
