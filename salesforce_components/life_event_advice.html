@@ -5,9 +5,27 @@
   <title>Life Event–Driven Advice</title>
   <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
   <style>
-    body{padding:1rem;background:#f3f2f2;}
-    .slds-card{margin-bottom:1.5rem;}
-    /* Add any specific styles for timeline if needed, or keep general */
+    body {
+      padding: 1rem;
+      background: #f3f2f2;
+    }
+    .slds-card {
+      margin-bottom: 1.5rem;
+    }
+    .slds-timeline__item_details .slds-card {
+        border: 1px solid #dddbda;
+        box-shadow: none;
+    }
+    .factset-analysis-section {
+        background-color: #f3f2f2; /* Light gray background for distinction */
+        padding: 0.75rem;
+        border-radius: .25rem;
+        margin-top: 0.5rem;
+    }
+    .factset-analysis-section h4 {
+        font-weight: bold;
+        color: #005fb2; /* FactSet-like blue */
+    }
   </style>
 </head>
 <body>
@@ -24,42 +42,231 @@
           </span>
         </div>
         <div class="slds-media__body">
-          <h2 class="slds-card__header-title slds-truncate">Life Event–Driven Advice</h2>
-          <p class="slds-text-body_small">Milestones & next‑best actions</p>
+          <h2 class="slds-card__header-title slds-truncate">Life Event–Driven Advice for Client: <strong>Sarah Miller</strong></h2>
+          <p class="slds-text-body_small">Key milestones, automated insights & recommended next steps</p>
         </div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium slds-p-vertical_medium" id="lifeEventTimeline">
-      <!-- timeline rendered by JS -->
+    <div class="slds-card__body slds-p-around_medium">
+      <ul class="slds-timeline" id="lifeEventTimeline">
+        <!-- timeline items rendered by JS -->
+      </ul>
     </div>
   </article>
 
   <script>
-    // Demo data for Life Events
-    const lifeEvents=[
-        {date:'2025-08-10',event:'Baby due',advice:'Start 529 College Savings Plan'},
-        {date:'2026-05-15',event:'Stock Option Vest',advice:'Discuss tax strategy'}
+    // More realistic demo data for Life Events
+    const lifeEventsData = [
+      {
+        date: '2024-03-15',
+        event: 'Marriage to David Miller',
+        eventType: 'relationship', // For icon selection
+        adviceTitle: 'Consolidate Finances & Update Estate Plan',
+        adviceDetail: 'Review joint account options, update beneficiaries on all accounts and insurance policies. Discuss long-term financial goals as a couple.',
+        factsetAnalysis: {
+          title: 'FactSet Scenario: Impact of Joint Filing',
+          points: [
+            'Projected tax savings of $2,500 annually by filing jointly.',
+            'Combined net worth allows for higher tier investment products.',
+            'Review risk tolerance alignment for joint investment strategy.'
+          ]
+        },
+        actions: [
+          { label: 'Schedule Joint Review', icon: 'event', type: 'neutral' },
+          { label: 'Update Beneficiaries Workflow', icon: 'flow', type: 'brand' }
+        ]
+      },
+      {
+        date: '2025-01-20',
+        event: 'Birth of Child: Emily Miller',
+        eventType: 'lead', // Using lead icon for 'new person'
+        adviceTitle: 'Establish College Savings (529 Plan) & Review Insurance',
+        adviceDetail: 'Set up a 529 plan for Emily. Review life insurance coverage to ensure family protection. Update will and guardianship.',
+        factsetAnalysis: {
+          title: 'FactSet Projection: Future Education Costs',
+          points: [
+            'Estimated 4-year private college cost in 18 years: $350,000 (projected).',
+            'Monthly contribution of $600 to 529 plan (moderate growth) could cover ~70% of projected costs.',
+            'Life insurance gap identified: additional $500K coverage recommended.'
+          ]
+        },
+        actions: [
+          { label: 'Open 529 Account', icon: 'education', type: 'brand' },
+          { label: 'Review Insurance Coverage', icon: 'shield', type: 'neutral' }
+        ]
+      },
+      {
+        date: '2026-07-01',
+        event: 'Sale of Tech Startup "InnovateNow"',
+        eventType: 'opportunity', // For business related events
+        adviceTitle: 'Strategic Re-investment & Tax Optimization',
+        adviceDetail: 'Develop a diversified investment strategy for the liquidity event proceeds. Focus on long-term growth and capital preservation. Explore tax-loss harvesting opportunities.',
+        factsetAnalysis: {
+          title: 'FactSet Analysis: Post-Liquidity Event Options',
+          points: [
+            'Model portfolio (60% equity / 40% fixed income) projects 6.5% annualized return.',
+            'Tax impact of sale: estimated $1.2M in capital gains. Strategies to defer/reduce available.',
+            'Charitable giving options with appreciated assets could provide tax benefits.'
+          ]
+        },
+        actions: [
+          { label: 'Develop Investment Proposal', icon: 'custom_apps', type: 'brand' },
+          { label: 'Consult Tax Advisor', icon: 'money', type: 'neutral' }
+        ]
+      },
+       {
+        date: '2027-02-10',
+        event: 'Inheritance Received',
+        eventType: 'thanks', // Using thanks/gift icon
+        adviceTitle: 'Integrate Inheritance into Financial Plan',
+        adviceDetail: 'Assess the impact of the inheritance on overall net worth and existing financial goals. Determine optimal allocation strategy considering tax implications and long-term objectives.',
+        factsetAnalysis: {
+          title: 'FactSet Scenario: Inheritance Impact',
+          points: [
+            'Inheritance of $250,000 increases likelihood of early retirement by 3 years.',
+            'Consider allocation to a trust for estate planning benefits.',
+            'Potential to fully fund grandchildren\'s education with a portion.'
+          ]
+        },
+        actions: [
+          { label: 'Update Financial Plan', icon: 'edit_form', type: 'brand' },
+          { label: 'Discuss Trust Options', icon: 'groups', type: 'neutral' }
+        ]
+      }
     ];
 
-    // Render life events timeline
-    const leDiv=document.getElementById('lifeEventTimeline');
-    if (leDiv) {
-        lifeEvents.forEach(l=>{
-          leDiv.insertAdjacentHTML('beforeend',`<div class="slds-timeline__item_expandable slds-timeline__item_call slds-m-bottom_small">
-            <span class="slds-assistive-text">Event</span>
-            <div class="slds-media">
-              <div class="slds-media__figure">
-                <span class="slds-icon_container slds-icon-standard-event slds-timeline__icon" title="Event">
-                  <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#event"></use></svg>
-                </span>
-              </div>
-              <div class="slds-media__body">
-                <p class="slds-m-left_x-small"><strong>\${l.event}</strong> – \${new Date(l.date).toLocaleDateString()}</p>
-                <p class="slds-m-left_x-small slds-text-body_small">Advice: \${l.advice}</p>
-              </div>
-            </div>
-          </div>`);
+    function getIconName(eventType) {
+        // Simple mapping, can be expanded
+        switch(eventType) {
+            case 'relationship': return 'groups';
+            case 'lead': return 'lead';
+            case 'opportunity': return 'opportunity';
+            case 'thanks': return 'thanks';
+            case 'event':
+            default: return 'event';
+        }
+    }
+
+    const timelineContainer = document.getElementById('lifeEventTimeline');
+
+    if (timelineContainer) {
+      lifeEventsData.forEach(eventData => {
+        const timelineItem = document.createElement('li');
+        timelineItem.className = 'slds-timeline__item';
+
+        const itemDot = document.createElement('span');
+        itemDot.className = 'slds-timeline__icon';
+        const dotIconContainer = document.createElement('span');
+        dotIconContainer.className = `slds-icon_container slds-icon-standard-${getIconName(eventData.eventType)}`;
+        dotIconContainer.title = eventData.eventType;
+        const dotSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        dotSvg.setAttribute('class', 'slds-icon slds-icon_small');
+        dotSvg.setAttribute('aria-hidden', 'true');
+        const dotUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        dotUse.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `../slds-assets/icons/standard-sprite/svg/symbols.svg#${getIconName(eventData.eventType)}`);
+        dotSvg.appendChild(dotUse);
+        dotIconContainer.appendChild(dotSvg);
+        itemDot.appendChild(dotIconContainer);
+        timelineItem.appendChild(itemDot);
+
+        const itemBody = document.createElement('div');
+        itemBody.className = 'slds-media slds-timeline__media slds-timeline__media_details';
+        
+        const itemFigure = document.createElement('div'); // Figure for the "call" icon, if desired, or remove
+        itemFigure.className = 'slds-media__figure slds-timeline__figure';
+        const figureIconContainer = document.createElement('span');
+        figureIconContainer.className = 'slds-icon_container slds-icon-standard-log-a-call'; // Example, can be dynamic
+        figureIconContainer.title = 'Actionable Event';
+        const figureSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        figureSvg.setAttribute('class', 'slds-icon slds-icon_small');
+        figureSvg.setAttribute('aria-hidden', 'true');
+        const figureUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        figureUse.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", '../slds-assets/icons/standard-sprite/svg/symbols.svg#log_a_call');
+        figureSvg.appendChild(figureUse);
+        figureIconContainer.appendChild(figureSvg);
+        itemFigure.appendChild(figureIconContainer);
+        // itemBody.appendChild(itemFigure); // Optional: if you want the call icon next to details
+
+        const itemContent = document.createElement('div');
+        itemContent.className = 'slds-media__body';
+
+        const contentGrid = document.createElement('div');
+        contentGrid.className = 'slds-grid slds-gutters_x-small slds-wrap';
+        
+        const titleCol = document.createElement('div');
+        titleCol.className = 'slds-col slds-size_1-of-1 slds-m-bottom_xx-small';
+        const eventTitle = document.createElement('h3');
+        eventTitle.className = 'slds-truncate';
+        eventTitle.title = eventData.event;
+        eventTitle.innerHTML = `<a href="#">${eventData.event}</a>`;
+        const eventDate = document.createElement('p');
+        eventDate.className = 'slds-text-body_small';
+        eventDate.textContent = new Date(eventData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        titleCol.appendChild(eventTitle);
+        titleCol.appendChild(eventDate);
+        contentGrid.appendChild(titleCol);
+
+        const detailsCard = document.createElement('article');
+        detailsCard.className = 'slds-card slds-timeline__item_details slds-col slds-size_1-of-1';
+        
+        const cardHeader = document.createElement('header');
+        cardHeader.className = 'slds-card__header slds-grid';
+        const cardHeaderTitle = document.createElement('h3');
+        cardHeaderTitle.className = 'slds-text-heading_small slds-truncate';
+        cardHeaderTitle.textContent = eventData.adviceTitle;
+        cardHeader.appendChild(cardHeaderTitle);
+        detailsCard.appendChild(cardHeader);
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'slds-card__body slds-card__body_inner';
+        const adviceDetailP = document.createElement('p');
+        adviceDetailP.textContent = eventData.adviceDetail;
+        cardBody.appendChild(adviceDetailP);
+
+        if (eventData.factsetAnalysis) {
+            const factsetSection = document.createElement('div');
+            factsetSection.className = 'factset-analysis-section slds-m-top_small';
+            const factsetTitle = document.createElement('h4');
+            factsetTitle.textContent = eventData.factsetAnalysis.title;
+            factsetSection.appendChild(factsetTitle);
+            const factsetList = document.createElement('ul');
+            factsetList.className = 'slds-list_dotted slds-m-left_medium';
+            eventData.factsetAnalysis.points.forEach(point => {
+                const listItem = document.createElement('li');
+                listItem.textContent = point;
+                factsetList.appendChild(listItem);
+            });
+            factsetSection.appendChild(factsetList);
+            cardBody.appendChild(factsetSection);
+        }
+        detailsCard.appendChild(cardBody);
+
+        const cardFooter = document.createElement('footer');
+        cardFooter.className = 'slds-card__footer';
+        eventData.actions.forEach(action => {
+            const button = document.createElement('button');
+            button.className = `slds-button slds-button_${action.type || 'neutral'} slds-m-right_x-small`;
+            
+            const btnIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            btnIcon.setAttribute('class', 'slds-button__icon slds-button__icon_left');
+            btnIcon.setAttribute('aria-hidden', 'true');
+            const btnIconUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+            btnIconUse.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `../slds-assets/icons/utility-sprite/svg/symbols.svg#${action.icon || 'info'}`);
+            btnIcon.appendChild(btnIconUse);
+            button.appendChild(btnIcon);
+            
+            button.appendChild(document.createTextNode(action.label));
+            button.onclick = () => alert(`Action: ${action.label} for ${eventData.event}`);
+            cardFooter.appendChild(button);
         });
+        detailsCard.appendChild(cardFooter);
+        
+        contentGrid.appendChild(detailsCard);
+        itemContent.appendChild(contentGrid);
+        itemBody.appendChild(itemContent);
+        timelineItem.appendChild(itemBody);
+        timelineContainer.appendChild(timelineItem);
+      });
     }
   </script>
 </body>
