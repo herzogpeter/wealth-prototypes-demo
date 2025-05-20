@@ -10,11 +10,21 @@
     .badge-red{background:#ea001e;color:#fff;}
     .badge-yellow{background:#ffb75d;color:#000;}
     .badge-green{background:#6ec664;color:#fff;}
+    .factset-insights { font-size: 0.8rem; color: #3e3e3c; margin-top: 0.25rem; }
+    .factset-source { font-weight: bold; color: #0070d2; }
+    .slds-spinner_container {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 9001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 1. Wallet Share & Held Away Analysis -->
   <article class="slds-card">
     <header class="slds-card__header slds-p-around_medium">
       <div class="slds-media slds-media_center">
@@ -26,30 +36,116 @@
           </span>
         </div>
         <div class="slds-media__body">
-          <h2 class="slds-card__header-title slds-truncate">Wallet Share & Held-Away Assets</h2>
-          <p class="slds-text-body_small">Identify hidden affluence & prioritize consolidation</p>
+          <h2 class="slds-card__header-title slds-truncate">Wallet Share & Held-Away Assets (Powered by FactSet Mercury)</h2>
+          <p class="slds-text-body_small">Identify hidden affluence & prioritize consolidation with AI-driven external data</p>
         </div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
-      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
-        <thead><tr><th>Client</th><th>Managed AUM</th><th>Estimated Total Wealth</th><th>Wallet Share</th><th>Held Away</th><th>Action</th></tr></thead>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium slds-is-relative">
+      <div id="spinnerContainer" class="slds-hide">
+        <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+          <span class="slds-assistive-text">Loading...</span>
+          <div class="slds-spinner__dot-a"></div>
+          <div class="slds-spinner__dot-b"></div>
+        </div>
+      </div>
+      <div class="slds-grid slds-grid_align-end slds-m-bottom_small">
+        <button class="slds-button slds-button_brand" onclick="enrichDataWithFactSet()">Enrich with FactSet Mercury Data</button>
+      </div>
+      <table class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout" role="grid">
+        <thead>
+          <tr>
+            <th scope="col" style="width:18%">Client</th>
+            <th scope="col" style="width:12%">Managed AUM</th>
+            <th scope="col" style="width:25%">Estimated Total Wealth <br><span class="slds-text-body_small">(Internal + FactSet Mercury)</span></th>
+            <th scope="col" style="width:10%">Wallet Share</th>
+            <th scope="col" style="width:15%">Held Away Assets</th>
+            <th scope="col" style="width:20%">FactSet Insights</th>
+          </tr>
+        </thead>
         <tbody id="walletTable"></tbody>
       </table>
     </div>
   </article>
 
-  <!-- Templates -->
-  <template id="walletRow"><tr><td class="client"></td><td class="aum"></td><td class="wealth"></td><td><span class="wallet"></span></td><td class="held"></td><td><button class="slds-button slds-button_neutral">Consolidate</button></td></tr></template>
-
   <script>
-    // Demo datasets
-    const wallets=[{c:'Darcy Family',aum:12,wealth:30},{c:'Bingley LLC',aum:4,wealth:20},{c:'Knightley Trust',aum:7,wealth:10}];
+    const initialClientData = [
+      { c: 'Darcy Family', internalAUM: 12, internalWealthEst: 20, factsetEnrichment: { unvestedStock: 8, propertyValue: 2, notes: "CEO at Pemberley Inc."} },
+      { c: 'Bingley LLC', internalAUM: 4, internalWealthEst: 10, factsetEnrichment: { privateEquity: 7, artCollection: 3, notes: "Recent M&A activity."} },
+      { c: 'Knightley Trust', internalAUM: 7, internalWealthEst: 8, factsetEnrichment: { landHoldings: 1.5, trustAssets: 0.5, notes: "Agricultural business owner."} },
+      { c: 'Wentworth Capital', internalAUM: 2, internalWealthEst: 3, factsetEnrichment: { navalPension: 0.5, overseasAssets: 1, notes: "Retired Navy Captain."} }
+    ];
 
-    // Wallet table
-    const wBody=document.getElementById('walletTable');
-    const wTmpl=document.getElementById('walletRow').content;
-    wallets.forEach(r=>{const row=wTmpl.cloneNode(true);row.querySelector('.client').textContent=r.c;row.querySelector('.aum').textContent='$'+r.aum+'M';row.querySelector('.wealth').textContent='$'+r.wealth+'M';const pct=(r.aum/r.wealth*100).toFixed(0)+'%';const walletSpan=row.querySelector('.wallet');walletSpan.textContent=pct;walletSpan.className='wallet slds-badge '+(r.aum/r.wealth<0.3?'badge-red':r.aum/r.wealth<0.6?'badge-yellow':'badge-green');row.querySelector('.held').textContent='$'+(r.wealth-r.aum)+'M';wBody.appendChild(row);});
+    let currentClientData = JSON.parse(JSON.stringify(initialClientData)); // Deep copy
+
+    const wBody = document.getElementById('walletTable');
+    const spinnerContainer = document.getElementById('spinnerContainer');
+
+    function formatCurrency(value) {
+      return '$' + value.toFixed(1) + 'M';
+    }
+
+    function renderTable(dataToRender) {
+      wBody.innerHTML = ''; // Clear existing rows
+      dataToRender.forEach(r => {
+        const row = document.createElement('tr');
+        
+        const totalWealth = r.factsetEnrichedWealth || r.internalWealthEst;
+        const walletShare = (r.internalAUM / totalWealth * 100);
+        const heldAway = totalWealth - r.internalAUM;
+
+        let insightsHtml = 'N/A';
+        if (r.factsetEnrichedWealth) { // Only show insights if data is enriched
+            insightsHtml = `<ul class="slds-list_dotted">`;
+            if(r.factsetEnrichment.unvestedStock) insightsHtml += `<li>Unvested Stock: ${formatCurrency(r.factsetEnrichment.unvestedStock)}</li>`;
+            if(r.factsetEnrichment.propertyValue) insightsHtml += `<li>Property Value: ${formatCurrency(r.factsetEnrichment.propertyValue)}</li>`;
+            if(r.factsetEnrichment.privateEquity) insightsHtml += `<li>Private Equity: ${formatCurrency(r.factsetEnrichment.privateEquity)}</li>`;
+            if(r.factsetEnrichment.artCollection) insightsHtml += `<li>Art Collection: ${formatCurrency(r.factsetEnrichment.artCollection)}</li>`;
+            if(r.factsetEnrichment.landHoldings) insightsHtml += `<li>Land Holdings: ${formatCurrency(r.factsetEnrichment.landHoldings)}</li>`;
+            if(r.factsetEnrichment.trustAssets) insightsHtml += `<li>Trust Assets: ${formatCurrency(r.factsetEnrichment.trustAssets)}</li>`;
+            if(r.factsetEnrichment.navalPension) insightsHtml += `<li>Pension Est.: ${formatCurrency(r.factsetEnrichment.navalPension)}</li>`;
+            if(r.factsetEnrichment.overseasAssets) insightsHtml += `<li>Overseas Assets: ${formatCurrency(r.factsetEnrichment.overseasAssets)}</li>`;
+            if(r.factsetEnrichment.notes) insightsHtml += `<li><em>Note: ${r.factsetEnrichment.notes}</em></li>`;
+            insightsHtml += `</ul>`;
+        }
+        
+        row.innerHTML = `
+          <td data-label="Client">${r.c}</td>
+          <td data-label="Managed AUM">${formatCurrency(r.internalAUM)}</td>
+          <td data-label="Estimated Total Wealth">${formatCurrency(totalWealth)} ${r.factsetEnrichedWealth ? '<span class="slds-badge slds-theme_success">FactSet Enriched</span>': ''}</td>
+          <td data-label="Wallet Share">
+            <span class="slds-badge ${walletShare < 30 ? 'badge-red' : walletShare < 60 ? 'badge-yellow' : 'badge-green'}">
+              ${walletShare.toFixed(0)}%
+            </span>
+          </td>
+          <td data-label="Held Away Assets">${formatCurrency(heldAway)}</td>
+          <td data-label="FactSet Insights" class="factset-insights">${insightsHtml}</td>
+        `;
+        wBody.appendChild(row);
+      });
+    }
+
+    function enrichDataWithFactSet() {
+      spinnerContainer.classList.remove('slds-hide');
+      
+      // Simulate API call to FactSet Mercury
+      setTimeout(() => {
+        currentClientData.forEach(client => {
+          let factsetContribution = 0;
+          for (const key in client.factsetEnrichment) {
+            if (typeof client.factsetEnrichment[key] === 'number') {
+              factsetContribution += client.factsetEnrichment[key];
+            }
+          }
+          client.factsetEnrichedWealth = client.internalWealthEst + factsetContribution;
+        });
+        renderTable(currentClientData);
+        spinnerContainer.classList.add('slds-hide');
+      }, 1500);
+    }
+
+    // Initial render with internal data only
+    renderTable(currentClientData);
   </script>
 </body>
 </html>
