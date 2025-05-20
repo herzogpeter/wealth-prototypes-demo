@@ -257,6 +257,12 @@
                 name: 'Transactional & Behavioral Insights',
                 path: 'salesforce_components/transactional_behavioral_insights.html',
                 description: 'Transactional & Behavioral Insights: Salesforce Data Cloud can unify not just investment data but also client behavioral and spending data from banking transactions. This allows analysis of cash flows and habits: e.g. “month-by-month breakdown of income and expenses” and categorized spending trends. MGP\\\'s focus is long-term planning; it doesn\\\'t track daily spending or provide personal finance management insights. By leveraging these real-time transactional insights, advisors can identify when a client\\\'s actual spending deviates from the plan\\\'s assumptions. For example, if MGP\\\'s plan assumed $5,000 monthly spending but Data Cloud shows the client recently spending $7,000/month, Salesforce can alert the advisor to revisit the plan. These client cash-flow insights go beyond MoneyGuidePro by grounding the plan in day-to-day reality. Advisors can then have more data-driven conversations (e.g. “You spent more on travel than planned last quarter; let\\\'s adjust your goal or budget”).'
+            },
+            {
+                id: 'factset_mercury_assistant',
+                name: 'FactSet Mercury Assistant',
+                path: 'salesforce_components/factset_mercury_assistant.html',
+                description: 'FactSet Mercury AI Capabilities: The FactSet Mercury API adds a generative AI layer on top of rich financial data. Mercury is a conversational AI (LLM) that can answer natural language queries about market data, companies, and more. Integrated into Salesforce (e.g. via an embedded chat or Agentforce action), Mercury can do things MGP cannot – such as on-the-fly research or answering ad-hoc questions with the latest data. For instance, an advisor could ask, “What’s the YTD performance of Client A’s portfolio vs S&P 500?” and Mercury (with access to real-time pricing and portfolio data) could instantly respond with figures and context. Or a client could query via a chatbot, “Can I still retire at 65 if my portfolio drops another 10%?” – Mercury might leverage current data and perhaps even call MoneyGuidePro’s projection API to provide a nuanced answer. MoneyGuidePro doesn’t offer such an on-demand Q&A interface; it requires the advisor to manually input scenario changes. Salesforce + Mercury goes beyond by providing AI-driven analysis in real time. FactSet\\\'s AI can incorporate “comprehensive financial fundamentals and pricing data”, enabling detailed answers about stocks or markets. This means advisors have a research assistant at their fingertips in CRM. Additionally, Mercury\\\'s conversational API can surface insights like “the highest closing stock price of a holding or key trends impacting a company” just by asking – tasks that would require manual research outside Salesforce. This empowers advisors to be more responsive and informed without leaving their workflow.'
             }
         ];
 
@@ -311,7 +317,8 @@
                 name: "Extending Beyond MGP with Real-Time Data (Salesforce + Mercury)",
                 prototypeIds: [
                     'live_portfolio_dashboard',
-                    'transactional_behavioral_insights'
+                    'transactional_behavioral_insights',
+                    'factset_mercury_assistant'
                 ]
             }
         ];

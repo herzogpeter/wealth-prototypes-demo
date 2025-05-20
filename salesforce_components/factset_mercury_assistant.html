@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FactSet Mercury Assistant</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .chat-box{border:1px solid #d8dde6;border-radius:.25rem;background:#fff;height:340px;overflow-y:auto;padding:.75rem;}
+    .bubble{padding:.5rem .75rem;border-radius:12px;margin-bottom:.5rem;max-width:75%;}
+    .user{background:#1589ee;color:#fff;margin-left:auto;}
+    .bot{background:#f3f2f2;border:1px solid #e0e0e0;}
+    .quick-btn{margin-right:.25rem;margin-bottom:.25rem;}
+    .typing{display:inline-block;width:6px;height:6px;border-radius:50%;background:#999;animation:blink 1s infinite alternate;}
+    @keyframes blink{to{opacity:.2;}}
+  </style>
+</head>
+<body>
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-bot" title="Mercury AI">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#bot"></use></svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title">FactSet Mercury Assistant</h2>
+          <p class="slds-text-body_small">Ask market, portfolio & planning questions in real time</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="chat-box" id="chatLog"></div>
+      <div class="slds-m-top_small">
+        <input type="text" id="chatInput" class="slds-input" placeholder="Ask a question… (press Enter)" onkeydown="if(event.key==='Enter')sendMsg()" />
+      </div>
+      <div class="slds-m-top_small" id="quickQueries">
+        <button class="slds-button slds-button_neutral quick-btn" onclick="quickAsk('What’s the YTD performance of Client A’s portfolio vs S&P 500?')">YTD vs S&P</button>
+        <button class="slds-button slds-button_neutral quick-btn" onclick="quickAsk('Key trends impacting Apple recently?')">Apple Trends</button>
+        <button class="slds-button slds-button_neutral quick-btn" onclick="quickAsk('Highest closing price of MSFT over the last year?')">MSFT High</button>
+      </div>
+    </div>
+  </article>
+
+<script>
+  // Mock Mercury response generator
+  function mercuryAnswer(q){
+    if(q.toLowerCase().includes('ytd performance')){
+      return `Client A's portfolio is **+6.8% YTD**, while the S&P 500 is **+9.4%**. The lag is mainly due to an underweight in large-cap tech. 📊`;
+    }
+    if(q.toLowerCase().includes('retire at 65')){
+      return `If your portfolio drops another 10%, your probability of retiring at 65 falls from **82% to 74%**. Consider increasing savings by $500/month or delaying retirement by 6 months.`;
+    }
+    if(q.toLowerCase().includes('apple')){
+      return `Recent Apple trends: \n• Services revenue up 12% YoY \n• Growing AI-on-device narrative after WWDC \n• Supply-chain diversification to India & Vietnam.`;
+    }
+    if(q.toLowerCase().includes('highest closing price')||q.toLowerCase().includes('msft')){
+      return `MSFT's highest closing price in the last 12 months was **$425.12 on 2025‑03‑18**.`;
+    }
+    return `Here’s the detailed result for **${q}**: \n• … (This is a mock response. In production, this would call the Mercury API and stream structured data & narrative.)`;
+  }
+
+  const log=document.getElementById('chatLog');
+  function appendBubble(text,cls){
+    const div=document.createElement('div');
+    div.className='bubble '+cls;
+    div.innerHTML=text.replace(/\n/g,'<br>');
+    log.appendChild(div);
+    log.scrollTop=log.scrollHeight;
+  }
+
+  function sendMsg(){
+    const input=document.getElementById('chatInput');
+    const text=input.value.trim();
+    if(!text) return;
+    appendBubble(text,'user');
+    input.value='';
+    // bot typing indicator
+    const typing=document.createElement('div');
+    typing.className='bubble bot';
+    typing.innerHTML='<span class="typing"></span> <span class="typing"></span> <span class="typing"></span>';
+    log.appendChild(typing);log.scrollTop=log.scrollHeight;
+    setTimeout(()=>{
+      typing.remove();
+      const answer=mercuryAnswer(text);
+      appendBubble(answer,'bot');
+    },600);
+  }
+
+  function quickAsk(q){
+    document.getElementById('chatInput').value=q;
+    sendMsg();
+  }
+</script>
+</body>
+</html>
