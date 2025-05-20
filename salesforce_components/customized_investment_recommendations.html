@@ -5,8 +5,47 @@
   <title>Customized Investment Recommendations</title>
   <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
   <style>
-    body{padding:1rem;background:#f3f2f2;}
-    .slds-card{margin-bottom:1.5rem;}
+    body {
+      padding: 1rem;
+      background: #f3f2f2;
+    }
+    .slds-card {
+      margin-bottom: 1.5rem;
+    }
+    .profile-detail-label {
+      font-weight: bold;
+      color: #3e3e3c;
+    }
+    .profile-detail-value {
+      color: #080707;
+    }
+    .esg-tag {
+      background-color: #04844b; /* SLDS success green */
+      color: white;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+    }
+    .rationale-highlight {
+      background-color: #f3f2f2; /* Light gray for AI/FactSet insights */
+      padding: 0.5rem;
+      border-radius: .25rem;
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+    }
+    .rationale-highlight strong {
+      color: #005fb2; /* FactSet/AI blue */
+    }
+    .recommendation-table th, .recommendation-table td {
+        padding: 0.5rem 0.75rem; /* More padding for readability */
+    }
+    .ai-insights-section {
+        border: 1px solid #dddbda;
+        padding: 1rem;
+        background-color: #fafafa;
+        border-radius: .25rem;
+    }
   </style>
 </head>
 <body>
@@ -23,66 +62,235 @@
           </span>
         </div>
         <div class="slds-media__body">
-          <h2 class="slds-card__header-title slds-truncate">Customized Investment Recommendations</h2>
-          <p class="slds-text-body_small">AI‑generated, client‑specific proposals</p>
+          <h2 class="slds-card__header-title slds-truncate">Customized Investment Recommendations for <strong>Johnathan Ayers</strong></h2>
+          <p class="slds-text-body_small">AI-powered, client-specific investment strategy adjustments</p>
         </div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+    <div class="slds-card__body slds-p-around_medium">
       <div class="slds-grid slds-wrap slds-gutters_medium">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
-          <h3 class="slds-text-heading_small">Client Profile Snapshot</h3>
-          <ul class="slds-list_dotted" id="profileList"></ul>
+        
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-bottom_medium">
+          <div class="slds-box slds-box_x-small slds-theme_shade">
+            <h3 class="slds-text-heading_medium slds-m-bottom_small">Client Profile & Preferences</h3>
+            <dl class="slds-list_horizontal slds-wrap" id="clientProfileDetails">
+              <!-- Client profile details rendered by JS -->
+            </dl>
+          </div>
         </div>
+
         <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
-          <h3 class="slds-text-heading_small">Recommended Adjustments</h3>
-          <table class="slds-table slds-table_fixed-layout slds-table_bordered" role="grid">
+          <div class="ai-insights-section slds-m-bottom_medium">
+            <h3 class="slds-text-heading_small slds-m-bottom_x-small">
+                <span class="slds-icon_container slds-icon-utility-einstein slds-m-right_x-small" title="AI Powered">
+                    <svg class="slds-icon slds-icon-text-default slds-icon_x-small" aria-hidden="true">
+                        <use xlink:href="../slds-assets/icons/utility-sprite/svg/symbols.svg#einstein"></use>
+                    </svg>
+                </span>
+                AI-Powered Insights & Key Observations
+            </h3>
+            <ul class="slds-list_dotted" id="aiInsightsList">
+              <!-- AI insights rendered by JS -->
+            </ul>
+          </div>
+
+          <h3 class="slds-text-heading_small">Recommended Portfolio Adjustments</h3>
+          <table class="slds-table slds-table_fixed-layout slds-table_bordered slds-table_col-bordered recommendation-table" role="grid" aria-label="Investment Recommendations">
             <thead>
               <tr class="slds-line-height_reset">
-                <th><div class="slds-truncate">Ticker / Fund</div></th>
-                <th><div class="slds-truncate">Rationale</div></th>
-                <th><div class="slds-truncate">Action</div></th>
+                <th scope="col" style="width:20%;"><div class="slds-truncate" title="Asset/Fund">Asset/Fund</div></th>
+                <th scope="col" style="width:15%;"><div class="slds-truncate" title="Action">Action</div></th>
+                <th scope="col" style="width:15%;"><div class="slds-truncate" title="Amount/%">Amount/%</div></th>
+                <th scope="col" style="width:35%;"><div class="slds-truncate" title="Rationale (FactSet/AI Driven)">Rationale (FactSet/AI Driven)</div></th>
+                <th scope="col" style="width:15%;"><div class="slds-truncate" title="Options">Options</div></th>
               </tr>
             </thead>
-            <tbody id="recoTable"></tbody>
+            <tbody id="recoTableBody"></tbody>
           </table>
         </div>
       </div>
     </div>
   </article>
 
-  <template id="recoRowTmpl">
+  <template id="recoRowTemplate">
     <tr>
-      <td class="ticker"></td>
-      <td class="rationale"></td>
-      <td><button class="slds-button slds-button_neutral">Add to Proposal</button></td>
+      <td data-label="Asset/Fund"><div class="slds-truncate asset-name" title="Asset Name"></div></td>
+      <td data-label="Action"><div class="slds-truncate action-type" title="Action Type"></div></td>
+      <td data-label="Amount/%"><div class="slds-truncate action-amount" title="Action Amount"></div></td>
+      <td data-label="Rationale">
+        <div class="rationale-text"></div>
+        <div class="esg-details slds-m-top_xx-small" style="display:none;">
+            <span class="slds-badge esg-score-badge"></span>
+            <span class="esg-impact-text"></span>
+        </div>
+      </td>
+      <td data-label="Options">
+        <button class="slds-button slds-button_neutral slds-button_small add-to-proposal-btn">Add to Proposal</button>
+        <!-- <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small view-factsheet-btn" title="View FactSheet">
+            <svg class="slds-button__icon" aria-hidden="true"><use xlink:href="../slds-assets/icons/utility-sprite/svg/symbols.svg#info"></use></svg>
+            <span class="slds-assistive-text">View FactSheet</span>
+        </button> -->
+      </td>
     </tr>
   </template>
 
   <script>
-    // Demo data for Investment Recommendations
-    const profile={risk:'Balanced',esg:true,liquidity:'Medium',concentration:'Tech 35%'};
-    const recos=[{ticker:'EEM','rationale':'Add EM exposure to diversify beyond US equities.'},{ticker:'AGG','rationale':'Increase bond allocation for capital preservation.'}];
+    const clientProfileData = {
+      name: 'Johnathan Ayers',
+      investmentObjective: 'Long-term Growth & Capital Appreciation',
+      riskTolerance: 'Moderate High',
+      timeHorizon: '15+ Years',
+      liquidityNeeds: 'Low ($25k accessible within 3 months)',
+      preferences: {
+        esgFocus: true,
+        esgThemes: ['Renewable Energy', 'Sustainable Agriculture'],
+        sectorExclusions: ['Tobacco', 'Fossil Fuels (Exploration)'],
+        sectorConcentrationLimit: 'Tech (Max 30%)',
+        preferredAssetClasses: ['Global Equities', 'Real Estate (REITs)']
+      },
+      currentPortfolioSummary: {
+        totalValue: '$1,250,000',
+        usEquities: '65%',
+        internationalEquities: '15%',
+        emergingMarkets: '0%',
+        fixedIncome: '15%',
+        cash: '5%',
+        techSectorConcentration: '38%' // Over limit
+      }
+    };
 
-    // Profile list
-    const profList=document.getElementById('profileList');
-    if (profList) {
-        Object.entries(profile).forEach(([k,v])=>{
-          profList.insertAdjacentHTML('beforeend',`<li><strong>\${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> \${v}</li>`);
+    const aiDrivenInsights = [
+        `Client's current tech sector concentration (${clientProfileData.currentPortfolioSummary.techSectorConcentration}) exceeds preferred limit of ${clientProfileData.preferences.sectorConcentrationLimit}.`,
+        `No exposure to Emerging Markets, despite 'Global Equities' preference. This represents a diversification opportunity.`,
+        `ESG preference is strong; current portfolio has only 20% ESG-aligned assets. Opportunity to increase alignment.`,
+        `FactSet Market Analysis: Emerging markets projected for 8-10% growth next 12-18 months, outperforming developed markets.`
+    ];
+
+    const investmentRecommendationsData = [
+      {
+        assetName: 'Vanguard FTSE Emerging Markets ETF (VWO)',
+        assetClass: 'Emerging Market Equity',
+        action: 'BUY',
+        amount: '10% of Portfolio ($125,000)',
+        rationale: "<strong>AI Recommendation:</strong> Diversify into Emerging Markets to align with 'Global Equities' preference and capture projected growth (FactSet). Reduces US equity overweight.",
+        esgScore: 'B+',
+        esgImpact: 'Moderate positive ESG impact.'
+      },
+      {
+        assetName: 'iShares ESG Aware MSCI USA ETF (ESGU)',
+        assetClass: 'US Large Cap Equity',
+        action: 'BUY',
+        amount: '15% of Portfolio ($187,500)',
+        rationale: "<strong>FactSet Analysis:</strong> High-quality US Large Cap exposure with strong ESG screening. Helps increase overall portfolio ESG alignment.",
+        esgScore: 'AA',
+        esgImpact: 'Significant positive ESG impact, aligns with Renewable Energy theme.'
+      },
+      {
+        assetName: 'Invesco QQQ Trust (QQQ)',
+        assetClass: 'US Large Cap Growth (Tech Heavy)',
+        action: 'REDUCE',
+        amount: '10% of QQQ Holding (approx. $47,500 based on assumed $475k QQQ holding if Tech is 38%)',
+        rationale: "<strong>AI Recommendation:</strong> Reduce tech concentration from 38% towards the 30% client limit. Proceeds can fund EM and ESG purchases.",
+        esgScore: 'C',
+        esgImpact: 'N/A for reduction.'
+      },
+      {
+        assetName: 'PIMCO Active Bond ETF (BOND)',
+        assetClass: 'Global Fixed Income',
+        action: 'MAINTAIN',
+        amount: '15% of Portfolio',
+        rationale: "<strong>Portfolio Review:</strong> Current fixed income allocation aligns with 'Moderate High' risk tolerance and provides stability. No change recommended at this time.",
+        esgScore: 'N/A',
+        esgImpact: ''
+      }
+    ];
+
+    function renderClientProfile() {
+      const profileContainer = document.getElementById('clientProfileDetails');
+      if (!profileContainer) return;
+      profileContainer.innerHTML = ''; // Clear existing
+
+      const addDetail = (label, value) => {
+        const dt = document.createElement('dt');
+        dt.className = 'slds-item_label profile-detail-label slds-p-right_small';
+        dt.textContent = label + ':';
+        const dd = document.createElement('dd');
+        dd.className = 'slds-item_detail profile-detail-value';
+        dd.textContent = value;
+        profileContainer.appendChild(dt);
+        profileContainer.appendChild(dd);
+      };
+      
+      addDetail('Objective', clientProfileData.investmentObjective);
+      addDetail('Risk Tolerance', clientProfileData.riskTolerance);
+      addDetail('Time Horizon', clientProfileData.timeHorizon);
+      addDetail('Liquidity Needs', clientProfileData.liquidityNeeds);
+      
+      let esgFocusValue = clientProfileData.preferences.esgFocus ? 'Yes' : 'No';
+      if (clientProfileData.preferences.esgFocus && clientProfileData.preferences.esgThemes.length > 0) {
+          esgFocusValue += ` (Themes: ${clientProfileData.preferences.esgThemes.join(', ')})`;
+      }
+      addDetail('ESG Focus', esgFocusValue);
+      addDetail('Sector Exclusions', clientProfileData.preferences.sectorExclusions.join(', ') || 'None');
+      addDetail('Tech Limit', clientProfileData.preferences.sectorConcentrationLimit);
+      
+      profileContainer.insertAdjacentHTML('beforeend', '<dt class="slds-item_label slds-size_1-of-1 slds-text-heading_small slds-m-top_medium">Current Portfolio Summary:</dt><dd class="slds-size_1-of-1"></dd>');
+      addDetail('Total Value', clientProfileData.currentPortfolioSummary.totalValue);
+      addDetail('US Equities', clientProfileData.currentPortfolioSummary.usEquities);
+      addDetail('Intl Equities', clientProfileData.currentPortfolioSummary.internationalEquities);
+      addDetail('EM Equities', clientProfileData.currentPortfolioSummary.emergingMarkets);
+      addDetail('Fixed Income', clientProfileData.currentPortfolioSummary.fixedIncome);
+      addDetail('Tech Concentration', clientProfileData.currentPortfolioSummary.techSectorConcentration);
+    }
+
+    function renderAIInsights() {
+        const insightsList = document.getElementById('aiInsightsList');
+        if (!insightsList) return;
+        insightsList.innerHTML = '';
+        aiDrivenInsights.forEach(insight => {
+            const li = document.createElement('li');
+            li.textContent = insight;
+            insightsList.appendChild(li);
         });
     }
 
-    // Reco table
-    const recoBody=document.getElementById('recoTable');
-    const recoTmpl=document.getElementById('recoRowTmpl').content;
-    if (recoBody && recoTmpl) {
-        recos.forEach(r=>{
-          const row=recoTmpl.cloneNode(true);
-          row.querySelector('.ticker').textContent=r.ticker;
-          row.querySelector('.rationale').textContent=r.rationale;
-          recoBody.appendChild(row);
-        });
+    function renderRecommendations() {
+      const recoTableBody = document.getElementById('recoTableBody');
+      const recoRowTemplate = document.getElementById('recoRowTemplate');
+
+      if (!recoTableBody || !recoRowTemplate) return;
+      recoTableBody.innerHTML = ''; // Clear existing rows
+
+      investmentRecommendationsData.forEach(reco => {
+        const rowClone = recoRowTemplate.content.cloneNode(true);
+        const cells = rowClone.querySelectorAll('td');
+
+        rowClone.querySelector('.asset-name').textContent = reco.assetName;
+        rowClone.querySelector('.asset-name').title = reco.assetName + ` (${reco.assetClass})`;
+        rowClone.querySelector('.action-type').textContent = reco.action;
+        rowClone.querySelector('.action-amount').textContent = reco.amount;
+        rowClone.querySelector('.rationale-text').innerHTML = reco.rationale; // Use innerHTML for strong tags
+
+        const esgDetailsDiv = rowClone.querySelector('.esg-details');
+        if (reco.esgScore && reco.esgScore !== 'N/A') {
+            esgDetailsDiv.style.display = 'block';
+            rowClone.querySelector('.esg-score-badge').textContent = `ESG: ${reco.esgScore}`;
+            rowClone.querySelector('.esg-impact-text').textContent = reco.esgImpact;
+        }
+        
+        rowClone.querySelector('.add-to-proposal-btn').onclick = () => {
+            alert(`'${reco.assetName}' recommendation added to client proposal.`);
+        };
+
+        recoTableBody.appendChild(rowClone);
+      });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderClientProfile();
+      renderAIInsights();
+      renderRecommendations();
+    });
   </script>
 </body>
 </html>
