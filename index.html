@@ -100,6 +100,20 @@
     <div id="nav-backdrop" class="nav-backdrop"></div>
 
     <div class="content-area">
+        <div class="prototype-navigation-controls slds-p-around_small slds-grid slds-grid_align-spread" style="border-bottom: 1px solid #dddbda; margin-bottom: 1rem; padding-left: 5rem;">
+            <button id="prev-prototype-btn" class="slds-button slds-button_neutral">
+                <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="slds-assets/icons/utility-sprite/svg/symbols.svg#chevronleft"></use>
+                </svg>
+                Previous
+            </button>
+            <button id="next-prototype-btn" class="slds-button slds-button_neutral">
+                Next
+                <svg class="slds-button__icon slds-button__icon_right" aria-hidden="true">
+                    <use xlink:href="slds-assets/icons/utility-sprite/svg/symbols.svg#chevronright"></use>
+                </svg>
+            </button>
+        </div>
         <div class="prototype-display">
             <iframe id="prototype-iframe" title="Prototype Display"></iframe>
         </div>
@@ -118,6 +132,10 @@
         const iframe = document.getElementById('prototype-iframe');
         const prototypeTitle = document.getElementById('prototype-title');
         const prototypeDetails = document.getElementById('prototype-details');
+
+        let currentPrototypeIndex = 0;
+        const prevBtn = document.getElementById('prev-prototype-btn');
+        const nextBtn = document.getElementById('next-prototype-btn');
 
         const prototypes = [
             {
@@ -377,6 +395,7 @@
         function loadPrototype(prototypeId) {
             const selectedPrototype = prototypes.find(p => p.id === prototypeId);
             if (selectedPrototype) {
+                currentPrototypeIndex = prototypes.findIndex(p => p.id === prototypeId);
                 iframe.src = selectedPrototype.path;
                 prototypeTitle.textContent = selectedPrototype.name;
                 prototypeDetails.textContent = selectedPrototype.description;
@@ -446,6 +465,22 @@
                 loadPrototype(prototypes[0].id);
             }
         }
+
+        function loadNextPrototype() {
+            if (prototypes.length === 0) return;
+            currentPrototypeIndex = (currentPrototypeIndex + 1) % prototypes.length;
+            loadPrototype(prototypes[currentPrototypeIndex].id);
+        }
+
+        function loadPreviousPrototype() {
+            if (prototypes.length === 0) return;
+            currentPrototypeIndex = (currentPrototypeIndex - 1 + prototypes.length) % prototypes.length;
+            loadPrototype(prototypes[currentPrototypeIndex].id);
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', loadPreviousPrototype);
+        if (nextBtn) nextBtn.addEventListener('click', loadNextPrototype);
+
     </script>
 </body>
 </html>
