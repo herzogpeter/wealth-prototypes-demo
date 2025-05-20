@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" class="slds-scope">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Prototype Data‑Source Matrix</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.25.6/styles/salesforce-lightning-design-system.min.css" crossorigin="anonymous" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;font-family:'Salesforce Sans',sans-serif;}
+    .ds-badge{background:#9faab5;color:#fff;padding:.15rem .45rem;border-radius:.25rem;font-size:.65rem;margin-right:.25rem;white-space:nowrap;}
+    .filter-btn.active{background:#5b5da6;color:#fff;}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="slds-page-header slds-page-header_record-home slds-m-bottom_large">
+    <div class="slds-page-header__row">
+      <div class="slds-page-header__col-title">
+        <div class="slds-media">
+          <div class="slds-media__figure">
+            <span class="slds-icon_container slds-icon-standard-filter" title="data"><svg class="slds-icon slds-icon_small"><use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#filter"></use></svg></span>
+          </div>
+          <div class="slds-media__body">
+            <h1 class="slds-page-header__title">Prototype Coverage by Core Data Sources</h1>
+            <p class="slds-page-header__name-meta">Filter prototypes that leverage Positions, Transactions, Performance, or FactSet data.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="slds-card slds-m-bottom_large">
+    <div class="slds-card__body slds-p-around_medium">
+      <span class="slds-text-title_bold slds-m-right_small">Filter by Data Source:</span>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-ds="positions">Positions</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-ds="transactions">Transactions</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-ds="performance">Performance</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-ds="factset">FactSet Mercury</button>
+      <button id="clear" class="slds-button slds-button_outline-brand slds-m-left_medium">Clear</button>
+    </div>
+  </div>
+
+  <!-- Prototype Cards -->
+  <div class="slds-grid slds-wrap" id="grid"></div>
+
+<script>
+// Minimal subset – extend with full list & accurate tags
+const prototypes=[
+  {name:'Live Portfolio – Advisor Dashboard',link:'salesforce_components/live_portfolio_dashboard.html',ds:['positions','transactions','performance','factset'],desc:'Real‑time holdings, performance & Mercury risk context.'},
+  {name:'Transactional & Behavioral Insights',link:'salesforce_components/transactional_behavioral_insights.html',ds:['transactions','performance'],desc:'Cash‑flow analytics vs. plan.'},
+  {name:'Real‑Time Portfolio Risk Alerts',link:'salesforce_components/real_time_portfolio_risk_alerts.html',ds:['positions','performance','factset'],desc:'Mercury risk analytics feed into Salesforce alerts.'},
+  {name:'AI Research & Decision Support',link:'salesforce_components/ai_research_assistant.html',ds:['factset','performance'],desc:'Natural‑language Q&A & attribution with Mercury.'},
+  {name:'Workflow Automation & Tasks',link:'salesforce_components/workflow_automation_center.html',ds:['positions','transactions','factset'],desc:'Flows triggered from data changes.'},
+  {name:'360° Client Dashboard',link:'salesforce_components/unified_client_view.html',ds:['positions','transactions','performance','factset'],desc:'Unified view with Mercury insights.'}
+];
+function label(key){return {positions:'Positions',transactions:'Transactions',performance:'Performance',factset:'FactSet Mercury'}[key];}
+const grid=document.getElementById('grid');
+function render(){grid.innerHTML='';prototypes.forEach(p=>{
+  const card=document.createElement('article');card.className='slds-card slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_medium slds-m-bottom_medium proto';card.dataset.ds=p.ds.join(' ');
+  card.innerHTML=`<div class="slds-text-heading_small">${p.name}</div>
+    <p class="slds-m-vertical_x-small">${p.desc}</p>
+    <p><a class="slds-button slds-button_link" href="${p.link}" target="_blank">Open Prototype</a></p>
+    <div class="slds-m-top_x-small">${p.ds.map(d=>`<span class='ds-badge'>${label(d)}</span>`).join(' ')}</div>`;
+  grid.appendChild(card);
+});}
+render();
+// Filter logic
+const btns=[...document.querySelectorAll('.filter-btn')];
+btns.forEach(b=>b.onclick=()=>{b.classList.toggle('active');filter();});
+function filter(){const act=btns.filter(b=>b.classList.contains('active')).map(b=>b.dataset.ds);
+ document.querySelectorAll('.proto').forEach(c=>{const tags=c.dataset.ds.split(' ');c.style.display=act.every(a=>tags.includes(a))?'':'none';});}
+clear.onclick=()=>{btns.forEach(b=>b.classList.remove('active'));filter();};
+</script>
+</body>
+</html>
