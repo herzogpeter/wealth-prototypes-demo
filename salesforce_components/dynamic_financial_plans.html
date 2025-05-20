@@ -5,69 +5,288 @@
   <title>Dynamic Plans & What‑If Scenarios</title>
   <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
   <style>
-    body{padding:1rem;background:#f3f2f2;}
-    .slds-card{margin-bottom:1.5rem;}
+    body { padding: 1rem; background: #f3f2f2; }
+    .slds-card { margin-bottom: 1.5rem; }
+    .metric-tile { text-align: center; padding: 1rem; border: 1px solid #dddbda; border-radius: .25rem; background: white; }
+    .metric-value { font-size: 1.75rem; font-weight: 700; }
+    .metric-label { font-size: 0.875rem; color: #54698d; }
+    .good { color: #2e844a; }
+    .warn { color: #ffb75d; }
+    .bad { color: #c23934; }
+    .scenario-impact-box { border: 1px solid #dddbda; border-radius: .25rem; padding: 1rem; background-color: #f9f9f9; }
+    .impact-item { margin-bottom: 0.5rem; }
+    .impact-change { font-weight: bold; }
+    .slds-spinner_container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 4. Dynamic Financial Plans & "What‑If" Scenarios -->
+  <!-- Current Plan Snapshot -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-dashboard-ea" title="Current Plan">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#dashboard_ea"></use></svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Current Financial Plan Snapshot</h2>
+          <p class="slds-text-body_small">Baseline data from MoneyGuidePro & Salesforce FSC. Updated: <span id="planDate"></span></p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="metric-tile">
+            <div id="baseProb" class="metric-value"></div>
+            <div class="metric-label">Retirement Success Prob.</div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="metric-tile">
+            <div id="baseCollege" class="metric-value"></div>
+            <div class="metric-label">College Funded %</div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="metric-tile">
+            <div id="baseNetWorth" class="metric-value"></div>
+            <div class="metric-label">Projected Net Worth (Ret.)</div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="metric-tile">
+            <div id="baseIncome" class="metric-value"></div>
+            <div class="metric-label">Est. Annual Ret. Income</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- What-If Scenario Modeler -->
   <article class="slds-card" id="scenarioCard">
     <header class="slds-card__header slds-p-around_medium">
       <div class="slds-media slds-media_center">
         <div class="slds-media__figure">
           <span class="slds-icon_container slds-icon-standard-form" title="Scenarios">
-            <svg class="slds-icon slds-icon_small" aria-hidden="true">
-              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#form"></use>
-            </svg>
+            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#form"></use></svg>
           </span>
         </div>
         <div class="slds-media__body">
-          <h2 class="slds-card__header-title slds-truncate">Dynamic Plans & What‑If Scenarios</h2>
-          <p class="slds-text-body_small">Model market & life changes interactively</p>
+          <h2 class="slds-card__header-title slds-truncate">Dynamic "What‑If" Scenario Modeler</h2>
+          <p class="slds-text-body_small">Powered by FactSet Mercury & Atlas Reasoning Engine</p>
         </div>
       </div>
     </header>
     <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
-      <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+      <div class="slds-grid slds-wrap slds-gutters_medium slds-m-bottom_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
           <div class="slds-form-element">
-            <label class="slds-form-element__label" for="scenarioSelect">Select Scenario</label>
+            <label class="slds-form-element__label" for="scenarioType">Scenario Type</label>
             <div class="slds-form-element__control">
               <div class="slds-select_container">
-                <select class="slds-select" id="scenarioSelect">
-                  <option value="marketDrop">20% Market Drop Next Year</option>
-                  <option value="vacationHome">Purchase $2M Vacation Home in 5 Years</option>
-                  <option value="rateSpike">Interest Rates +200 bps</option>
+                <select class="slds-select" id="scenarioType" onchange="updateScenarioInputs()">
+                  <option value="marketDrop">Market Event: Portfolio Drop</option>
+                  <option value="largePurchase">Life Event: Large Purchase</option>
+                  <option value="interestRate">Economic: Interest Rate Change</option>
+                  <option value="earlyRetirement">Goal Change: Early Retirement</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12" id="scenarioInputsContainer">
+          <!-- Dynamic inputs will be injected here -->
+        </div>
         <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
-          <button class="slds-button slds-button_brand" onclick="runScenario()">Run</button>
+          <button class="slds-button slds-button_brand" onclick="runScenario()">Run Scenario</button>
         </div>
       </div>
-      <div id="scenarioResult" class="slds-box slds-box_x-small slds-is-relative" style="min-height:120px;">
-        <p class="slds-text-body_regular">Select a scenario and click Run to view impact...</p>
+      
+      <h3 class="slds-text-heading_small slds-m-bottom_small">Scenario Impact Analysis:</h3>
+      <div id="scenarioResult" class="scenario-impact-box slds-is-relative">
+        <p class="slds-text-body_regular">Select a scenario type, adjust parameters, and click "Run Scenario" to view the potential impact on the financial plan.</p>
       </div>
     </div>
   </article>
 
   <script>
-    // Scenarios
-    function runScenario(){
-      const scenarioSelect = document.getElementById('scenarioSelect');
-      const scenarioResult = document.getElementById('scenarioResult');
-      if (!scenarioSelect || !scenarioResult) return;
+    const basePlan = {
+      prob: 82,
+      college: 95,
+      netWorth: 2850000,
+      income: 110000,
+      date: new Date().toLocaleDateString()
+    };
 
-      const val = scenarioSelect.value;
-      let text = '';
-      if(val==='marketDrop') text='Projected portfolio value may fall 12% peak-to-trough; Retirement goal shortfall increases by $250k. Consider shifting 5% to bonds.';
-      if(val==='vacationHome') text='Adding $2M purchase reduces liquidity ratio to low. Recommend financing 50% with mortgage and adjusting cash reserves.';
-      if(val==='rateSpike') text='Bond values may drop 7%. Income portfolio yield rises to 5%. Suggest laddered bond strategy to mitigate duration risk.';
-      scenarioResult.innerHTML=`<p class='slds-text-body_regular'>\${text}</p>`;
+    document.getElementById('planDate').textContent = basePlan.date;
+    document.getElementById('baseProb').textContent = basePlan.prob + '%';
+    document.getElementById('baseProb').classList.add(basePlan.prob >= 80 ? 'good' : basePlan.prob >= 70 ? 'warn' : 'bad');
+    document.getElementById('baseCollege').textContent = basePlan.college + '%';
+    document.getElementById('baseNetWorth').textContent = '$' + (basePlan.netWorth / 1000000).toFixed(2) + 'M';
+    document.getElementById('baseIncome').textContent = '$' + basePlan.income.toLocaleString();
+
+    const scenarioInputsContainer = document.getElementById('scenarioInputsContainer');
+    const scenarioResult = document.getElementById('scenarioResult');
+
+    const scenarioDefinitions = {
+      marketDrop: {
+        label: "Market Drop (%)",
+        inputType: "number",
+        defaultValue: 20,
+        min: 5, max: 50, step: 5,
+        unit: "%",
+        generateImpact: (value) => {
+          const probImpact = Math.max(0, basePlan.prob - Math.round(value * 0.75)); // Example: 75% of drop %
+          const netWorthImpact = basePlan.netWorth * (1 - (value / 100) * 0.6); // Example: 60% of drop affects NW
+          return `
+            <div class="impact-item">Retirement Success Probability: 
+              <span class="impact-change ${probImpact < basePlan.prob ? (probImpact < 70 ? 'bad' : 'warn') : 'good'}">
+                ${probImpact}%
+              </span> (was ${basePlan.prob}%)
+            </div>
+            <div class="impact-item">Projected Net Worth at Retirement: 
+              <span class="impact-change ${netWorthImpact < basePlan.netWorth ? 'bad' : 'good'}">
+                $${(netWorthImpact / 1000000).toFixed(2)}M
+              </span> (was $${(basePlan.netWorth / 1000000).toFixed(2)}M)
+            </div>
+            <p class="slds-m-top_small"><strong>Mercury Suggestion:</strong> Consider dollar-cost averaging into equities if timeline permits, or increasing allocation to defensive assets by ${Math.round(value/4)}%.</p>
+          `;
+        }
+      },
+      largePurchase: {
+        label: "Purchase Amount ($)",
+        inputType: "number",
+        defaultValue: 2000000,
+        min: 100000, max: 5000000, step: 100000,
+        unit: "$",
+        generateImpact: (value) => {
+          const incomeImpact = basePlan.income - Math.round(value * 0.02); // Example: 2% of purchase price from annual income
+          const netWorthImpact = basePlan.netWorth - Math.round(value * 0.3); // Example: 30% of purchase price from retirement net worth due to opportunity cost
+           return `
+            <div class="impact-item">Est. Annual Retirement Income: 
+              <span class="impact-change ${incomeImpact < basePlan.income ? 'bad' : 'good'}">
+                $${incomeImpact.toLocaleString()}
+              </span> (was $${basePlan.income.toLocaleString()})
+            </div>
+             <div class="impact-item">Projected Net Worth at Retirement: 
+              <span class="impact-change ${netWorthImpact < basePlan.netWorth ? 'bad' : 'good'}">
+                $${(netWorthImpact / 1000000).toFixed(2)}M
+              </span> (was $${(basePlan.netWorth / 1000000).toFixed(2)}M)
+            </div>
+            <p class="slds-m-top_small"><strong>Mercury Suggestion:</strong> This purchase significantly impacts retirement projections. Recommend financing ${Math.round(value*0.6/100000)*100000} (60%) and increasing annual savings by $${Math.round(value*0.01).toLocaleString()} to offset.</p>
+          `;
+        }
+      },
+      interestRate: {
+        label: "Rate Change (bps)",
+        inputType: "number",
+        defaultValue: 200,
+        min: -200, max: 300, step: 50,
+        unit: "bps",
+        generateImpact: (value) => {
+          const incomeImpact = basePlan.income + Math.round(basePlan.income * (value / 10000) * 2); // Example: 2x leverage on rate change for income
+          const probImpact = basePlan.prob + Math.round(value / 50); // Example: 1% prob change per 50bps
+          return `
+            <div class="impact-item">Est. Annual Retirement Income: 
+              <span class="impact-change ${incomeImpact > basePlan.income ? 'good' : 'bad'}">
+                $${incomeImpact.toLocaleString()}
+              </span> (was $${basePlan.income.toLocaleString()})
+            </div>
+            <div class="impact-item">Retirement Success Probability: 
+              <span class="impact-change ${probImpact > basePlan.prob ? 'good' : (probImpact < 70 ? 'bad' : 'warn')}">
+                ${probImpact}%
+              </span> (was ${basePlan.prob}%)
+            </div>
+            <p class="slds-m-top_small"><strong>Mercury Suggestion:</strong> ${value > 0 ? 'Higher rates may boost fixed income returns. Consider locking in longer duration bonds.' : 'Lower rates may reduce income. Explore dividend-focused equities or alternative income sources.'}</p>
+          `;
+        }
+      },
+      earlyRetirement: {
+        label: "Retire Earlier by (Years)",
+        inputType: "number",
+        defaultValue: 5,
+        min: 1, max: 10, step: 1,
+        unit: "Years",
+        generateImpact: (value) => {
+          const probImpact = Math.max(0, basePlan.prob - (value * 4)); // Example: 4% prob drop per year earlier
+          const incomeImpact = basePlan.income * (1 - (value * 0.05)); // Example: 5% income drop per year earlier
+          return `
+            <div class="impact-item">Retirement Success Probability: 
+              <span class="impact-change ${probImpact < basePlan.prob ? (probImpact < 70 ? 'bad' : 'warn') : 'good'}">
+                ${probImpact}%
+              </span> (was ${basePlan.prob}%)
+            </div>
+            <div class="impact-item">Est. Annual Retirement Income: 
+              <span class="impact-change ${incomeImpact < basePlan.income ? 'bad' : 'good'}">
+                $${Math.round(incomeImpact).toLocaleString()}
+              </span> (was $${basePlan.income.toLocaleString()})
+            </div>
+            <p class="slds-m-top_small"><strong>Mercury Suggestion:</strong> Retiring ${value} years earlier significantly reduces probability and income. To maintain current lifestyle, an additional $${(value * 150000).toLocaleString()} in savings or alternative income sources would be needed.</p>
+          `;
+        }
+      }
+    };
+
+    function updateScenarioInputs() {
+      const scenarioType = document.getElementById('scenarioType').value;
+      const definition = scenarioDefinitions[scenarioType];
+      scenarioInputsContainer.innerHTML = `
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="scenarioValue">${definition.label}</label>
+          <div class="slds-form-element__control">
+            <input type="${definition.inputType}" id="scenarioValue" class="slds-input" 
+                   value="${definition.defaultValue}" 
+                   ${definition.min !== undefined ? `min="${definition.min}"` : ''} 
+                   ${definition.max !== undefined ? `max="${definition.max}"` : ''} 
+                   ${definition.step !== undefined ? `step="${definition.step}"` : ''} />
+          </div>
+        </div>
+      `;
+      scenarioResult.innerHTML = '<p class="slds-text-body_regular">Adjust parameters and click "Run Scenario".</p>';
     }
+
+    function runScenario() {
+      const scenarioType = document.getElementById('scenarioType').value;
+      const scenarioValueInput = document.getElementById('scenarioValue');
+      if (!scenarioValueInput) return;
+      const value = parseFloat(scenarioValueInput.value);
+      
+      const definition = scenarioDefinitions[scenarioType];
+      if (isNaN(value) || (definition.min !== undefined && value < definition.min) || (definition.max !== undefined && value > definition.max)) {
+        alert(`Please enter a valid value for ${definition.label} (between ${definition.min} and ${definition.max} ${definition.unit || ''}).`);
+        return;
+      }
+
+      scenarioResult.innerHTML = `
+        <div class="slds-spinner_container slds-is-relative">
+          <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+            <span class="slds-assistive-text">Loading...</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+          </div>
+        </div>
+        <p class="slds-text-align_center slds-m-vertical_large">FactSet Mercury & Atlas Engine are modeling the scenario...</p>
+      `;
+
+      // Simulate API call to FactSet Mercury
+      setTimeout(() => {
+        const impactHtml = definition.generateImpact(value);
+        scenarioResult.innerHTML = impactHtml;
+      }, 1500);
+    }
+
+    // Initialize
+    updateScenarioInputs();
   </script>
 </body>
 </html>
