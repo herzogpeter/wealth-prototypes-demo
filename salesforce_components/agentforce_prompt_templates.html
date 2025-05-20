@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agentforce Prompt Templates & Knowledge Integration</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    textarea{min-height:180px;}
+    .preview{min-height:160px;border:1px solid #d8dde6;border-radius:.25rem;padding:.75rem;background:#fff;white-space:pre-wrap;}
+    .kb-item{display:flex;align-items:center;margin-bottom:.25rem;}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-drafts"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#drafts"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">Prompt Template Builder – Plan Summary</h2><p class="slds-text-body_small">Standardize prompts & ground them in firm knowledge</p></div>
+      </div>
+    </header>
+
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <!-- Template Editor -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+          <div class="slds-form-element slds-m-bottom_small">
+            <label class="slds-form-element__label" for="template">Template</label>
+            <textarea id="template" class="slds-textarea">Summarize the client financial plan using the data below:\nGoals:\n{{goalList}}\n\nCurrent Plan Performance: {{planPerformance}}\n\nAlerts:\n{{alerts}}\n\nBased on company guidelines, recommend next best actions in a friendly, compliant tone.</textarea>
+          </div>
+          <button class="slds-button slds-button_brand" onclick="generate()">Generate Preview</button>
+        </div>
+
+        <!-- Knowledge Base -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+          <h3 class="slds-text-heading_small">Knowledge Base Snippets</h3>
+          <div id="kb"></div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <h3 class="slds-text-heading_small slds-m-top_medium">LLM Input Preview</h3>
+      <div id="preview" class="preview"><em>Click Generate to view compiled prompt…</em></div>
+    </div>
+  </article>
+
+<script>
+  // Mock client data
+  const client={goals:['Retirement at 65 – $2M','College fund – $300k'],perf:'78% probability of success',alerts:['Funding dropped 5% due to market','College goal on track 92% funded']};
+  // Knowledge snippets
+  const snippets=[
+    {id:'risk',text:'Always ensure recommendations match the client’s documented risk tolerance.'},
+    {id:'diversify',text:'We recommend maintaining diversification to reduce concentration risk.'},
+    {id:'consult',text:'For changes exceeding risk guidelines, direct the client to discuss with their advisor.'}
+  ];
+  const kbDiv=document.getElementById('kb');
+  snippets.forEach(s=>{const div=document.createElement('div');div.className='kb-item';div.innerHTML=`<input type='checkbox' id='${s.id}' checked><label for='${s.id}' class='slds-p-left_x-small'>${s.text}</label>`;kbDiv.appendChild(div);});
+
+  function compileTemplate(){let tpl=document.getElementById('template').value;
+    tpl=tpl.replace('{{goalList}}',client.goals.map(g=>'• '+g).join('\n'));
+    tpl=tpl.replace('{{planPerformance}}',client.perf);
+    tpl=tpl.replace('{{alerts}}',client.alerts.map(a=>'• '+a).join('\n'));
+    const selected=snippets.filter(s=>document.getElementById(s.id).checked).map(s=>'• '+s.text).join('\n');
+    return tpl+'\n\nFirm Guidelines to Apply:\n'+selected;
+  }
+
+  function generate(){const out=compileTemplate();document.getElementById('preview').textContent=out;}
+</script>
+</body>
+</html>
