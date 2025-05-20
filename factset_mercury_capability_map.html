@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>FactSet Mercury API – Prototype Reference</title>
+  <!-- SLDS 2.25.6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.25.6/styles/salesforce-lightning-design-system.min.css" integrity="sha512-e0tu1e4JWEdIc8s7UxjibJN7VkqU1jYJ9+x6t8uWfm7VszTEpN6z22h7p7U4+dPqz3oIMCiZKH2ftx4p4Qo0Zg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .mercury-badge{background:#0070d2;color:#fff;padding:.15rem .45rem;border-radius:.25rem;font-size:.65rem;margin-right:.25rem;white-space:nowrap;}
+    .audience-badge{font-size:.65rem;padding:.15rem .45rem;border-radius:.25rem;color:#fff;margin-left:.3rem;white-space:nowrap;}
+    .advisor{background:#4bca81;}.client{background:#1589ee;}
+    .filter-btn.active{background:#0070d2;color:#fff;}
+    .code-btn{font-size:.6rem;padding:.1rem .4rem;margin-left:.3rem;}
+  </style>
+</head>
+<body class="slds-scope">
+  <!-- Page Header -->
+  <div class="slds-page-header slds-page-header_record-home slds-m-bottom_large">
+    <div class="slds-page-header__row">
+      <div class="slds-page-header__col-title">
+        <div class="slds-media">
+          <div class="slds-media__figure">
+            <span class="slds-icon_container slds-icon-standard-campaign" title="Mercury"><svg class="slds-icon slds-icon_small"><use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#campaign"></use></svg></span>
+          </div>
+          <div class="slds-media__body">
+            <h1 class="slds-page-header__title">FactSet Mercury API – Prototype Capability Map</h1>
+            <p class="slds-page-header__name-meta">Interactive reference for product & engineering</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="slds-card slds-m-bottom_large">
+    <div class="slds-card__body slds-p-around_medium filter-bar">
+      <span class="slds-text-title_bold slds-m-right_small">Filter by Mercury Capability:</span>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="nlq">NL Q&A</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="attribution">Attribution</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="risk">Risk</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="events">Events</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="scenario">Scenario</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="content">Content Gen</button>
+      <button class="slds-button slds-button_neutral slds-m-right_x-small filter-btn" data-filter="realtime">Real‑Time</button>
+      <button id="clear" class="slds-button slds-button_outline-brand slds-m-left_medium">Clear</button>
+    </div>
+  </div>
+
+  <!-- Prototype List -->
+  <div class="slds-grid slds-wrap" id="cards">
+    <!-- Template injected via JS -->
+  </div>
+
+<script>
+// === Data (truncated sample for brevity, insert full list in production) ===
+const data=[
+ {id:'ai_research',name:'AI Research & Decision Support',aud:'advisor',link:'#',caps:['nlq','realtime'],desc:'Virtual research assistant answering NL queries.'},
+ {id:'risk_dash',name:'Risk Monitoring Dashboard',aud:'advisor',link:'#',caps:['risk'],desc:'Mercury risk scores & alerts for portfolios.'},
+ {id:'client_chat',name:'Client Portfolio Chatbot',aud:'client',link:'#',caps:['nlq','realtime'],desc:'Client Q&A bot with live data.'},
+ {id:'commentary',name:'AI Portfolio Commentary',aud:'advisor',link:'#',caps:['content','attribution','events'],desc:'Narrative report generator.'},
+];
+// === Render cards ===
+const grid=document.getElementById('cards');
+function render(){grid.innerHTML='';data.forEach(p=>{
+ const card=document.createElement('article');card.className='slds-card slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_medium slds-m-bottom_medium proto';card.dataset.caps=p.caps.join(' ');
+ card.innerHTML=`<div class="slds-text-heading_small">${p.name} <span class="audience-badge ${p.aud}">${p.aud==='client'?'Client':'Advisor'}</span></div>
+ <p class="slds-m-vertical_x-small">${p.desc}</p>
+ <p><a class="slds-button slds-button_link" href="${p.link}" target="_blank">Open Prototype</a></p>
+ <div class="slds-m-top_x-small">${p.caps.map(c=>`<span class="mercury-badge">${capLabel(c)}</span>`).join('')}</div>`;
+ grid.appendChild(card);});}
+function capLabel(k){return {nlq:'NL Q&A',attribution:'Attribution',risk:'Risk',events:'Events',scenario:'Scenario',content:'Content',realtime:'Real‑Time'}[k]||k;}
+render();
+// === Filter logic ===
+const btns=[...document.querySelectorAll('.filter-btn')];
+btns.forEach(b=>b.onclick=()=>{b.classList.toggle('active');filter();});
+function filter(){const act=btns.filter(b=>b.classList.contains('active')).map(b=>b.dataset.filter);
+ document.querySelectorAll('.proto').forEach(card=>{const caps=card.dataset.caps.split(' ');card.style.display=act.every(a=>caps.includes(a))?'':'none';});}
+document.getElementById('clear').onclick=()=>{btns.forEach(b=>b.classList.remove('active'));filter();};
+</script>
+</body>
+</html>
