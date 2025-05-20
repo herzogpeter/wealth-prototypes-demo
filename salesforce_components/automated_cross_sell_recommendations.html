@@ -7,11 +7,20 @@
   <style>
     body{padding:1rem;background:#f3f2f2;}
     .slds-card{margin-bottom:1.5rem;}
+    .mercury-insight { font-size: 0.8rem; color: #3e3e3c; margin-top: 0.25rem; }
+    .slds-spinner_container {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 9001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 2. Automated Cross‑Sell Recommendations -->
   <article class="slds-card">
     <header class="slds-card__header slds-p-around_medium">
       <div class="slds-media slds-media_center">
@@ -21,30 +30,113 @@
           </span>
         </div>
         <div class="slds-media__body">
-          <h2 class="slds-card__header-title slds-truncate">Automated Cross‑Sell Recommendations</h2>
-          <p class="slds-text-body_small">Surface next‑best products & services</p>
+          <h2 class="slds-card__header-title slds-truncate">Automated Cross‑Sell Recommendations (Powered by FactSet Mercury)</h2>
+          <p class="slds-text-body_small">Surface next‑best products & services with AI-driven market insights</p>
         </div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
-      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
-        <thead><tr><th>Client</th><th>Gap Identified</th><th>Recommendation</th><th>Potential Revenue</th><th>Action</th></tr></thead>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium slds-is-relative">
+      <div id="spinnerContainer" class="slds-hide">
+        <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+          <span class="slds-assistive-text">Loading...</span>
+          <div class="slds-spinner__dot-a"></div>
+          <div class="slds-spinner__dot-b"></div>
+        </div>
+      </div>
+      <div class="slds-grid slds-grid_align-end slds-m-bottom_small">
+        <button class="slds-button slds-button_brand" onclick="refreshRecommendations()">Refresh with FactSet Mercury</button>
+      </div>
+      <table class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout" role="grid">
+        <thead>
+          <tr>
+            <th scope="col" style="width:20%">Client</th>
+            <th scope="col" style="width:20%">Gap Identified (Salesforce FSC)</th>
+            <th scope="col" style="width:25%">Mercury Recommendation & Rationale</th>
+            <th scope="col" style="width:15%">Potential Revenue</th>
+            <th scope="col" style="width:20%">Action</th>
+          </tr>
+        </thead>
         <tbody id="crossTable"></tbody>
       </table>
     </div>
   </article>
 
-  <!-- Templates -->
-  <template id="crossRow"><tr><td class="client"></td><td class="gap"></td><td class="rec"></td><td class="rev"></td><td><button class="slds-button slds-button_neutral">Create Task</button></td></tr></template>
-
   <script>
-    // Demo datasets
-    const xSell=[{c:'Darcy Family',gap:'No Private Trust',rec:'Set up Family Trust',rev:25},{c:'Bingley LLC',gap:'No Insurance',rec:'High‑Net‑Worth Liability Policy',rev:5}];
+    const initialRecommendations = [
+      { 
+        c: 'Darcy Family', 
+        gap: 'No Private Trust', 
+        mercuryRec: 'Establish Family Trust for estate planning.',
+        mercuryRationale: 'FactSet Mercury analysis indicates client net worth & family structure align with peers holding trusts. Current tax laws favor early establishment.',
+        rev: 25 
+      },
+      { 
+        c: 'Bingley LLC', 
+        gap: 'No Business Liability Insurance', 
+        mercuryRec: 'High‑Net‑Worth Liability Policy for Business.',
+        mercuryRationale: 'FactSet Mercury data on similar-sized LLCs in their sector shows 85% carry >$5M liability coverage. Recent industry litigation trends highlight increased risk.',
+        rev: 5 
+      },
+      {
+        c: 'Knightley Trust',
+        gap: 'Low allocation to alternative investments',
+        mercuryRec: 'Consider Private Equity Fund focused on sustainable agriculture.',
+        mercuryRationale: 'FactSet Mercury identifies strong growth in sustainable ag. Client\'s existing land holdings and ESG preference (from CRM) make this a suitable diversification.',
+        rev: 15
+      },
+      {
+        c: 'Wentworth Capital',
+        gap: 'Cash holdings exceed 20% of AUM',
+        mercuryRec: 'Deploy excess cash into short-duration bond ladder.',
+        mercuryRationale: 'FactSet Mercury projects stable short-term rates. Current yield curve offers attractive entry for laddered strategy to enhance returns on idle cash.',
+        rev: 8
+      }
+    ];
 
-    // Cross‑sell table
-    const cBody=document.getElementById('crossTable');
-    const cTmpl=document.getElementById('crossRow').content;
-    xSell.forEach(r=>{const row=cTmpl.cloneNode(true);row.querySelector('.client').textContent=r.c;row.querySelector('.gap').textContent=r.gap;row.querySelector('.rec').textContent=r.rec;row.querySelector('.rev').textContent='$'+r.rev+'k';cBody.appendChild(row);});
+    let currentRecommendations = JSON.parse(JSON.stringify(initialRecommendations));
+    const cBody = document.getElementById('crossTable');
+    const spinnerContainer = document.getElementById('spinnerContainer');
+
+    function formatRevenue(value) {
+      return '$' + value + 'k Annually';
+    }
+
+    function renderTable(dataToRender) {
+      cBody.innerHTML = ''; // Clear existing rows
+      dataToRender.forEach(r => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td data-label="Client">${r.c}</td>
+          <td data-label="Gap Identified">${r.gap}</td>
+          <td data-label="Mercury Recommendation">
+            <strong>${r.mercuryRec}</strong>
+            <div class="mercury-insight">${r.mercuryRationale}</div>
+          </td>
+          <td data-label="Potential Revenue">${formatRevenue(r.rev)}</td>
+          <td data-label="Action"><button class="slds-button slds-button_neutral" onclick="createTask('${r.c}', '${r.mercuryRec}')">Create Advisor Task</button></td>
+        `;
+        cBody.appendChild(row);
+      });
+    }
+
+    function refreshRecommendations() {
+      spinnerContainer.classList.remove('slds-hide');
+      // Simulate API call to FactSet Mercury for new/updated recommendations
+      setTimeout(() => {
+        // For demo, we'll just re-render the same data. In a real app, new data would be fetched.
+        // Example: Shuffle or slightly modify data to show update
+        currentRecommendations.push(currentRecommendations.shift()); // Cycle array for demo
+        renderTable(currentRecommendations);
+        spinnerContainer.classList.add('slds-hide');
+      }, 1500);
+    }
+    
+    function createTask(client, recommendation) {
+        alert(`Task created for advisor to discuss "${recommendation}" with ${client}.`);
+    }
+
+    // Initial render
+    renderTable(currentRecommendations);
   </script>
 </body>
 </html>
