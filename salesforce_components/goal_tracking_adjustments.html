@@ -5,9 +5,49 @@
   <title>Goal Tracking & Real‑Time Adjustments</title>
   <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
   <style>
-    body{padding:1rem;background:#f3f2f2;}
-    .slds-card{margin-bottom:1.5rem;}
-    .progress-text{font-size:0.75rem;color:#3e3e3c;}
+    body {
+      padding: 1rem;
+      background: #f3f2f2;
+    }
+    .slds-card {
+      margin-bottom: 1.5rem;
+    }
+    .progress-text {
+      font-size: 0.75rem;
+      color: #3e3e3c;
+      margin-left: 0.25rem;
+    }
+    .status-icon {
+      margin-right: 0.5rem;
+    }
+    .slds-badge_at-risk {
+      background-color: #ffb75d; /* SLDS warning yellow */
+      color: #080707;
+    }
+    .slds-badge_off-track {
+      background-color: #c23934; /* SLDS error red */
+      color: white;
+    }
+    .slds-badge_on-track {
+      background-color: #04844b; /* SLDS success green */
+      color: white;
+    }
+    .action-button-group .slds-button {
+        margin-right: 0.5rem;
+    }
+    .action-button-group .slds-button:last-child {
+        margin-right: 0;
+    }
+    .task-created-icon {
+        color: #0070d2; /* SLDS blue */
+        margin-left: 0.5rem;
+    }
+    .last-updated-text {
+        font-size: 0.7rem;
+        color: #54698d;
+        margin-top: 0.25rem;
+        display: block;
+    }
   </style>
 </head>
 <body>
@@ -25,19 +65,20 @@
         </div>
         <div class="slds-media__body">
           <h2 class="slds-card__header-title slds-truncate">Goal Tracking & Real‑Time Adjustments</h2>
-          <p class="slds-text-body_small">Live progress vs. target & recommended actions</p>
+          <p class="slds-text-body_small">Live progress vs. target & recommended actions for client: <strong>Jane Doe</strong></p>
         </div>
       </div>
     </header>
-    <div class="slds-card__body slds-p-horizontal_medium">
-      <table class="slds-table slds-table_fixed-layout slds-table_bordered slds-table_col-bordered" role="grid">
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <table class="slds-table slds-table_fixed-layout slds-table_bordered slds-table_col-bordered" role="grid" aria-label="Financial Goals Tracking">
         <thead>
           <tr class="slds-line-height_reset">
-            <th scope="col"><div class="slds-truncate">Goal</div></th>
-            <th scope="col"><div class="slds-truncate">Target</div></th>
-            <th scope="col"><div class="slds-truncate">Projected</div></th>
-            <th scope="col"><div class="slds-truncate">Progress</div></th>
-            <th scope="col"><div class="slds-truncate">Actions</div></th>
+            <th scope="col" style="width: 20%;"><div class="slds-truncate" title="Goal Name">Goal Name</div></th>
+            <th scope="col" style="width: 15%;"><div class="slds-truncate" title="Target Amount">Target Amount</div></th>
+            <th scope="col" style="width: 15%;"><div class="slds-truncate" title="Current Value">Current Value</div></th>
+            <th scope="col" style="width: 15%;"><div class="slds-truncate" title="Projected Value">Projected Value</div></th>
+            <th scope="col" style="width: 15%;"><div class="slds-truncate" title="Progress">Progress</div></th>
+            <th scope="col" style="width: 20%;"><div class="slds-truncate" title="Recommended Actions / Tasks">Recommended Actions / Tasks</div></th>
           </tr>
         </thead>
         <tbody id="goalTable"></tbody>
@@ -47,36 +88,199 @@
 
   <template id="goalRowTmpl">
     <tr>
-      <td class="goalName"></td>
-      <td></td>
-      <td></td>
-      <td>
-        <div class="slds-progress-bar slds-progress-bar_x-small"><span class="slds-progress-bar__value" style="width:0%"></span></div>
-        <span class="progress-text"></span>
+      <td data-label="Goal Name">
+        <div class="slds-truncate goalName" title="Goal Name"></div>
+        <span class="last-updated-text"></span>
       </td>
-      <td><button class="slds-button slds-button_neutral">View Plan</button></td>
+      <td data-label="Target Amount">
+        <div class="slds-truncate targetAmount" title="Target Amount"></div>
+      </td>
+      <td data-label="Current Value">
+        <div class="slds-truncate currentAmount" title="Current Value"></div>
+      </td>
+      <td data-label="Projected Value">
+        <div class="slds-truncate projectedAmount" title="Projected Value"></div>
+      </td>
+      <td data-label="Progress">
+        <div class="slds-grid slds-grid_vertical-align-center">
+          <div class="slds-col slds-grow">
+            <div class="slds-progress-bar slds-progress-bar_x-small" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" role="progressbar">
+              <span class="slds-progress-bar__value" style="width:0%;">
+                <span class="slds-assistive-text">Progress: 0%</span>
+              </span>
+            </div>
+          </div>
+          <div class="slds-col slds-shrink-none">
+            <span class="progress-text"></span>
+          </div>
+        </div>
+        <div class="slds-m-top_xx-small">
+            <span class="slds-badge status-badge"></span>
+        </div>
+      </td>
+      <td data-label="Recommended Actions">
+        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+            <div class="slds-col slds-grow action-button-group">
+              <!-- Action buttons will be populated here -->
+            </div>
+            <div class="slds-col slds-shrink-none advisor-task-indicator">
+                <!-- Advisor task icon will be populated here -->
+            </div>
+        </div>
+      </td>
     </tr>
   </template>
 
   <script>
-    // Demo data for Goal Tracking
-    const goals=[{name:'Retirement',target:2000000,projected:1800000,pct:90},{name:'College Fund',target:300000,projected:310000,pct:103}];
+    // More realistic demo data for Goal Tracking
+    const goalsData = [
+      {
+        name: 'Retirement Nest Egg',
+        target: 2000000,
+        current: 1500000,
+        projected: 1850000, // Projected progress: 1850000 / 2000000 = 92.5% (< 95%)
+        status: 'at-risk',
+        recommendedAction: 'Increase monthly contribution by $500 or adjust asset allocation (e.g., +5% equities).',
+        actionButtonText: 'Review Plan',
+        actionButtonIcon: 'edit',
+        factsetLastUpdated: '2025-05-20T08:15:00Z'
+      },
+      {
+        name: 'Children\'s College Fund (Emily)',
+        target: 300000,
+        current: 280000,
+        projected: 315000, // Projected progress: 315000 / 300000 = 105% (>= 95%)
+        status: 'on-track',
+        recommendedAction: 'Maintain current strategy. Monitor performance quarterly.',
+        actionButtonText: 'View Details',
+        actionButtonIcon: 'preview',
+        factsetLastUpdated: '2025-05-20T08:30:00Z'
+      },
+      {
+        name: 'Dream Vacation (2028)',
+        target: 50000,
+        current: 20000,
+        projected: 35000, // Projected progress: 35000 / 50000 = 70% (< 95%)
+        status: 'off-track',
+        recommendedAction: 'Significant contribution increase needed ($1,000/month) or re-evaluate goal timeline.',
+        actionButtonText: 'Discuss Options',
+        actionButtonIcon: 'call',
+        factsetLastUpdated: '2025-05-19T10:00:00Z'
+      },
+      {
+        name: 'New Home Down Payment (2026)',
+        target: 150000,
+        current: 120000,
+        projected: 140000, // Projected progress: 140000 / 150000 = 93.3% (< 95%)
+        status: 'at-risk',
+        recommendedAction: 'Consider lump-sum contribution from bonus or explore higher-yield short-term investments.',
+        actionButtonText: 'Explore Investments',
+        actionButtonIcon: 'chart',
+        factsetLastUpdated: '2025-05-20T09:05:00Z'
+      },
+      {
+        name: 'Emergency Fund',
+        target: 75000,
+        current: 78000,
+        projected: 78000, // Projected progress: 78000 / 75000 = 104% (>= 95%)
+        status: 'on-track',
+        recommendedAction: 'Goal achieved and funded. Review annually.',
+        actionButtonText: 'View Statement',
+        actionButtonIcon: 'paste',
+        factsetLastUpdated: '2025-05-18T14:00:00Z'
+      }
+    ];
+
+    function getStatusBadgeClass(status) {
+      if (status === 'on-track') return 'slds-badge_on-track';
+      if (status === 'at-risk') return 'slds-badge_at-risk';
+      if (status === 'off-track') return 'slds-badge_off-track';
+      return '';
+    }
+
+    function getProgressBarClass(status) {
+        if (status === 'on-track') return 'slds-theme_success';
+        if (status === 'at-risk') return 'slds-theme_warning';
+        if (status === 'off-track') return 'slds-theme_error'; // Using error for off-track for stronger visual cue
+        return '';
+    }
 
     // Render goals table
-    const goalBody=document.getElementById('goalTable');
-    const goalTmpl=document.getElementById('goalRowTmpl').content;
-    if (goalBody && goalTmpl) {
-        goals.forEach(g=>{
-          const r=goalTmpl.cloneNode(true);
-          r.querySelector('.goalName').textContent=g.name;
-          r.children[1].textContent='$'+g.target.toLocaleString();
-          r.children[2].textContent='$'+g.projected.toLocaleString();
-          const bar=r.querySelector('.slds-progress-bar__value');
-          bar.style.width=g.pct+'%';
-          bar.classList.add(g.pct>=100?'slds-theme_success':'slds-theme_warning');
-          r.querySelector('.progress-text').textContent=g.pct+'%';
-          goalBody.appendChild(r);
-        });
+    const goalTableBody = document.getElementById('goalTable');
+    const goalRowTemplate = document.getElementById('goalRowTmpl').content;
+
+    if (goalTableBody && goalRowTemplate) {
+      goalsData.forEach(goal => {
+        const row = goalRowTemplate.cloneNode(true);
+        const currentProgressPercentage = Math.min(Math.round((goal.current / goal.target) * 100), 100);
+        const projectedProgressPercentage = Math.min(Math.round((goal.projected / goal.target) * 100), 100);
+
+        row.querySelector('.goalName').textContent = goal.name;
+        row.querySelector('.goalName').title = goal.name;
+        const lastUpdatedEl = row.querySelector('.last-updated-text');
+        if (goal.factsetLastUpdated) {
+            lastUpdatedEl.textContent = `FactSet Forecast: ${new Date(goal.factsetLastUpdated).toLocaleString()}`;
+        } else {
+            lastUpdatedEl.textContent = `FactSet Forecast: N/A`;
+        }
+
+        row.querySelector('.targetAmount').textContent = '$' + goal.target.toLocaleString();
+        row.querySelector('.currentAmount').textContent = '$' + goal.current.toLocaleString();
+        row.querySelector('.projectedAmount').textContent = '$' + goal.projected.toLocaleString();
+
+        const progressBarValue = row.querySelector('.slds-progress-bar__value');
+        const progressBar = row.querySelector('.slds-progress-bar');
+        progressBarValue.style.width = currentProgressPercentage + '%';
+        progressBarValue.querySelector('.slds-assistive-text').textContent = `Progress: ${currentProgressPercentage}%`;
+        progressBar.setAttribute('aria-valuenow', currentProgressPercentage);
+
+        const barThemeClass = getProgressBarClass(goal.status); // Color based on overall status
+        if(barThemeClass) progressBarValue.classList.add(barThemeClass);
+
+        row.querySelector('.progress-text').textContent = currentProgressPercentage + '%';
+
+        const statusBadge = row.querySelector('.status-badge');
+        statusBadge.textContent = goal.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        statusBadge.classList.add(getStatusBadgeClass(goal.status));
+
+        const actionButtonGroup = row.querySelector('.action-button-group');
+        const advisorTaskIndicator = row.querySelector('.advisor-task-indicator');
+
+        let fullRecommendedAction = goal.recommendedAction;
+
+        // Simulate Apex creating an advisor task if projected progress < 95%
+        if (projectedProgressPercentage < 95) {
+          const taskIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          taskIcon.setAttribute('class', 'slds-icon slds-icon-text-default slds-icon_x-small task-created-icon');
+          taskIcon.setAttribute('aria-hidden', 'true');
+          const taskIconUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+          taskIconUse.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", '../slds-assets/icons/standard-sprite/svg/symbols.svg#task');
+          taskIcon.appendChild(taskIconUse);
+          advisorTaskIndicator.appendChild(taskIcon);
+          advisorTaskIndicator.title = "Advisor Task Created in Salesforce";
+
+          fullRecommendedAction += " (Salesforce Task auto-created for advisor follow-up.)";
+        }
+
+
+        const actionButton = document.createElement('button');
+        actionButton.className = 'slds-button slds-button_neutral';
+        actionButton.title = fullRecommendedAction;
+
+        const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        buttonIcon.setAttribute('class', 'slds-button__icon slds-button__icon_left');
+        buttonIcon.setAttribute('aria-hidden', 'true');
+        const iconUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        iconUse.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `../slds-assets/icons/utility-sprite/svg/symbols.svg#${goal.actionButtonIcon || 'info'}`);
+        buttonIcon.appendChild(iconUse);
+        actionButton.appendChild(buttonIcon);
+
+        actionButton.appendChild(document.createTextNode(goal.actionButtonText || 'View Plan'));
+        actionButton.onclick = () => alert(`Action for ${goal.name}:\n${fullRecommendedAction}`);
+        actionButtonGroup.appendChild(actionButton);
+
+        goalTableBody.appendChild(row);
+      });
     }
   </script>
 </body>
