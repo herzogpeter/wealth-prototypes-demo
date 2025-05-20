@@ -281,6 +281,12 @@
                 name: 'Agentforce Automated Task Execution',
                 path: 'salesforce_components/agentforce_automated_tasks.html',
                 description: 'Automated Task Execution: Agentforce agents can not only chat, but actually perform tasks via Salesforce Flow and Apex actions ￼ ￼. Take advantage of this for routine but time-consuming processes. For example, after a client meeting, an agent could automatically draft meeting notes and update the plan objects: it might read the conversation transcript (if available), identify discussed changes (e.g., “client wants to retire at 64 instead of 62”), update the Goal record in Salesforce, and even enqueue a recalculation in MoneyGuidePro (if an integration allows). Similarly, an agent could monitor data and “autonomously execute” a sequence of steps when triggers occur ￼. Imagine a “Market Dip Response” agent: if markets fall by a certain percentage, the agent kicks off, identifies all affected clients (Data Cloud query), prioritizes those near retirement, and generates a personalized email for each outlining the impact and reassurance. It could even draft talking points or call scripts for advisors to use. This level of automation and intelligent planning was previously not possible, but with Agentforce’s Atlas Reasoning breaking down complex tasks and Salesforce’s integration of data, it’s within reach. AI agents effectively serve as junior analysts for the advisory team, crunching numbers and scouting issues so that human advisors can focus on high-touch conversations.'
+            },
+            {
+                id: 'agentforce_prompt_templates',
+                name: 'Agentforce Prompt Templates & Knowledge Integration',
+                path: 'salesforce_components/agentforce_prompt_templates.html',
+                description: 'Prompt Templates & Knowledge Integration: Use Prompt Templates in Agentforce to standardize how the AI interacts with planning data. For instance, create a template for “Plan Summary Prompt” that always pulls in the client’s goal list, latest plan performance, and any alerts, and then asks the LLM to summarize or recommend an action. This ensures consistency in outputs. You can also feed the agent a knowledge base of financial planning guidelines (company-specific best practices or compliance-approved advice snippets) so that its answers align with firm policy. That way, if a client asks the AI agent a sensitive question (e.g., “Should I invest more in stocks right now?”), the response will be grounded in the advisor’s general guidance (and perhaps politely direct them to talk to their advisor for personalized advice, maintaining compliance).'
             }
         ];
 
@@ -339,7 +345,8 @@
                     'factset_mercury_assistant',
                     'real_time_alerts_modeling',
                     'financial_plan_copilot',
-                    'agentforce_automated_tasks'
+                    'agentforce_automated_tasks',
+                    'agentforce_prompt_templates'
                 ]
             }
         ];
@@ -442,49 +449,3 @@
     </script>
 </body>
 </html>
-<environment_details>
-# VSCode Visible Files
-splash.html
-
-# VSCode Open Tabs
-proactive_updates.html
-salesforce_components/proactive_updates.html
-salesforce_components/interactive_client_portal.html
-salesforce_components/multi_channel_engagement_campaigns.html
-salesforce_components/live_portfolio_dashboard.html
-salesforce_components/transactional_behavioral_insights.html
-salesforce_components/factset_mercury_assistant.html
-salesforce_components/real_time_alerts_modeling.html
-salesforce_components/financial_plan_copilot.html
-salesforce_components/agentforce_automated_tasks.html
-index.html
-salesforce_components/segmentation_targeted_campaigns.html
-salesforce_components/dynamic_financial_plans.html
-salesforce_components/agentforce_prompt_templates.html
-splash.html
-salesforce_components/wallet_share_analysis.html
-salesforce_components/automated_cross_sell_recommendations.html
-salesforce_components/lead_generation_external_events.html
-salesforce_components/unified_client_view.html
-salesforce_components/workflow_automation_center.html
-salesforce_components/ai_research_assistant.html
-salesforce_components/management_analytics_dashboard.html
-salesforce_components/real_time_portfolio_risk_alerts.html
-salesforce_components/performance_deviation_attribution.html
-salesforce_components/automated_compliance_monitoring.html
-salesforce_components/scenario_analysis_stress_testing.html
-salesforce_components/portfolio_drift_quality_control.html
-salesforce_components/automated_personalized_reports.html
-salesforce_components/goal_tracking_adjustments.html
-salesforce_components/life_event_advice.html
-salesforce_components/customized_investment_recommendations.html
-
-# Current Time
-5/20/2025, 7:41:52 AM (America/Chicago, UTC-5:00)
-
-# Context Window Usage
-324,500 / 1,048.576K tokens used (31%)
-
-# Current Mode
-ACT MODE
-</environment_details>
