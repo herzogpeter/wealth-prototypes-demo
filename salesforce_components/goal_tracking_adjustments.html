@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Goal Tracking & Real‑Time Adjustments</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .progress-text{font-size:0.75rem;color:#3e3e3c;}
+  </style>
+</head>
+<body>
+
+  <!-- 1. Goal Tracking with Real-Time Adjustments -->
+  <article class="slds-card" id="goalTrackingCard">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-goals" title="Goals">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#goals"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Goal Tracking & Real‑Time Adjustments</h2>
+          <p class="slds-text-body_small">Live progress vs. target & recommended actions</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium">
+      <table class="slds-table slds-table_fixed-layout slds-table_bordered slds-table_col-bordered" role="grid">
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col"><div class="slds-truncate">Goal</div></th>
+            <th scope="col"><div class="slds-truncate">Target</div></th>
+            <th scope="col"><div class="slds-truncate">Projected</div></th>
+            <th scope="col"><div class="slds-truncate">Progress</div></th>
+            <th scope="col"><div class="slds-truncate">Actions</div></th>
+          </tr>
+        </thead>
+        <tbody id="goalTable"></tbody>
+      </table>
+    </div>
+  </article>
+
+  <template id="goalRowTmpl">
+    <tr>
+      <td class="goalName"></td>
+      <td></td>
+      <td></td>
+      <td>
+        <div class="slds-progress-bar slds-progress-bar_x-small"><span class="slds-progress-bar__value" style="width:0%"></span></div>
+        <span class="progress-text"></span>
+      </td>
+      <td><button class="slds-button slds-button_neutral">View Plan</button></td>
+    </tr>
+  </template>
+
+  <script>
+    // Demo data for Goal Tracking
+    const goals=[{name:'Retirement',target:2000000,projected:1800000,pct:90},{name:'College Fund',target:300000,projected:310000,pct:103}];
+
+    // Render goals table
+    const goalBody=document.getElementById('goalTable');
+    const goalTmpl=document.getElementById('goalRowTmpl').content;
+    if (goalBody && goalTmpl) {
+        goals.forEach(g=>{
+          const r=goalTmpl.cloneNode(true);
+          r.querySelector('.goalName').textContent=g.name;
+          r.children[1].textContent='$'+g.target.toLocaleString();
+          r.children[2].textContent='$'+g.projected.toLocaleString();
+          const bar=r.querySelector('.slds-progress-bar__value');
+          bar.style.width=g.pct+'%';
+          bar.classList.add(g.pct>=100?'slds-theme_success':'slds-theme_warning');
+          r.querySelector('.progress-text').textContent=g.pct+'%';
+          goalBody.appendChild(r);
+        });
+    }
+  </script>
+</body>
+</html>

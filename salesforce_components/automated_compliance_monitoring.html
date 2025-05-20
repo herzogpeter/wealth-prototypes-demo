@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Automated Compliance Monitoring Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .badge-red{background:#ea001e;color:#fff;}
+    .badge-yellow{background:#ffb75d;color:#000;}
+  </style>
+</head>
+<body>
+  <!-- 3. Automated Compliance Monitoring -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><div class="slds-media slds-media_center"><div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-approval"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#approval"></use></svg></span></div><div class="slds-media__body"><h2 class="slds-card__header-title">Compliance & Regulatory Alerts</h2><p class="slds-text-body_small">Suitability, KYC, AML warnings</p></div></div></header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium"><table class="slds-table slds-table_bordered"><thead><tr><th>Date</th><th>Account</th><th>Issue</th><th>Severity</th><th>Status</th></tr></thead><tbody id="compTable"></tbody></table></div>
+  </article>
+
+  <!-- Templates -->
+  <template id="compRow"><tr><td class="date"></td><td class="acct"></td><td class="issue"></td><td><span class="sev slds-badge"></span></td><td class="status"></td></tr></template>
+
+<script>
+  // Sample data
+  const compAlerts=[{d:'05/17/25',acct:'Darcy‑Retirement',issue:'IPS breach – risk score exceeded',sev:'High',status:'Open'},{d:'05/16/25',acct:'Bingley Brokerage',issue:'Potential AML flag – large cash txn',sev:'Medium',status:'Investigating'}];
+  const sevCls={'High':'badge-red','Medium':'badge-yellow'};
+
+  function populate(id,tmpl,data,mapFn){const body=document.getElementById(id);const t=document.getElementById(tmpl).content;data.forEach(r=>{const row=t.cloneNode(true);mapFn(row,r);body.appendChild(row);});}
+
+  populate('compTable','compRow',compAlerts,(row,r)=>{row.querySelector('.date').textContent=r.d;row.querySelector('.acct').textContent=r.acct;row.querySelector('.issue').textContent=r.issue;const s=row.querySelector('.sev');s.textContent=r.sev;s.classList.add(sevCls[r.sev]);row.querySelector('.status').textContent=r.status;});
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interactive Client Portal & Chatbot</title>
+  <!-- Salesforce Lightning Design System -->
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css">
+  <style>
+    body { padding:1rem; background:#f3f2f2; }
+    .slds-scope .slds-card { margin-bottom: 1rem; }
+    .chart-placeholder {
+      height: 200px;
+      background-color: #f3f2f2;
+      border: 1px dashed #dddbda;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #54698d;
+      margin-bottom: 1rem;
+    }
+    .chatbot-container {
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chatbot-messages {
+      flex-grow: 1;
+      border: 1px solid #dddbda;
+      padding: 0.5rem;
+      overflow-y: auto;
+      background-color: white;
+      margin-bottom: 0.5rem;
+    }
+    .chatbot-input {
+      display: flex;
+    }
+    .chatbot-input .slds-input {
+      flex-grow: 1;
+      margin-right: 0.5rem;
+    }
+    .message {
+      padding: 0.25rem 0.5rem;
+      margin-bottom: 0.25rem;
+      border-radius: 0.25rem;
+      max-width: 80%;
+    }
+    .message.user {
+      background-color: #0070d2;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .message.bot {
+      background-color: #e0e5ee;
+      color: #080707;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="slds-scope">
+    <!-- Main Page Header -->
+    <div class="slds-page-header slds-m-bottom_medium">
+      <div class="slds-page-header__row">
+        <div class="slds-page-header__col-title">
+          <div class="slds-media">
+            <div class="slds-media__figure">
+              <span class="slds-icon_container slds-icon-standard-dashboard" title="Client Portal">
+                <svg class="slds-icon slds-icon_large" aria-hidden="true">
+                  <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#dashboard"></use>
+                </svg>
+              </span>
+            </div>
+            <div class="slds-media__body">
+              <div class="slds-page-header__name">
+                <div class="slds-page-header__name-title">
+                  <h1>
+                    <span class="slds-page-header__title slds-truncate" title="Interactive Client Portal">Interactive Client Portal</span>
+                  </h1>
+                </div>
+              </div>
+              <p class="slds-page-header__name-meta">Real-time portfolio insights & AI Assistant</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slds-grid slds-gutters slds-wrap">
+      <!-- Left Column: Portfolio Data -->
+      <div class="slds-col slds-size_1-of-1 slds-large-size_8-of-12">
+        <!-- Portfolio Overview -->
+        <article class="slds-card">
+          <header class="slds-card__header slds-p-around_medium">
+            <h2 class="slds-card__header-title">
+              <span class="slds-icon_container slds-icon-standard-account slds-m-right_small">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#account"></use></svg>
+              </span>
+              Portfolio Overview
+            </h2>
+          </header>
+          <div class="slds-card__body slds-card__body_inner">
+            <dl class="slds-list_horizontal slds-wrap">
+              <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Total Value">Total Value:</dt>
+              <dd class="slds-item_detail slds-truncate" title="$1,234,567.89">$1,234,567.89</dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Day's Gain/Loss">Day's Gain/Loss:</dt>
+              <dd class="slds-item_detail slds-truncate" title="+$5,678.90" style="color: green;">+$5,678.90</dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate" title="YTD Return">YTD Return:</dt>
+              <dd class="slds-item_detail slds-truncate" title="+8.5%">+8.5%</dd>
+            </dl>
+          </div>
+        </article>
+
+        <!-- Performance Chart -->
+        <article class="slds-card">
+          <header class="slds-card__header slds-p-around_medium">
+            <h2 class="slds-card__header-title">
+              <span class="slds-icon_container slds-icon-standard-metrics slds-m-right_small">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#metrics"></use></svg>
+              </span>
+              Portfolio Performance
+            </h2>
+          </header>
+          <div class="slds-card__body slds-card__body_inner">
+            <div class="chart-placeholder">Interactive Performance Chart (FactSet Data)</div>
+            <p class="slds-text-align_center slds-text-body_small">
+              Performance against S&P 500: <span style="color: green;">+2.1%</span> (QTD)
+            </p>
+          </div>
+        </article>
+
+        <!-- Asset Allocation -->
+        <article class="slds-card">
+          <header class="slds-card__header slds-p-around_medium">
+            <h2 class="slds-card__header-title">
+              <span class="slds-icon_container slds-icon-standard-chart slds-m-right_small">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#chart"></use></svg>
+              </span>
+              Asset Allocation
+            </h2>
+          </header>
+          <div class="slds-card__body slds-card__body_inner">
+            <div class="chart-placeholder">Asset Allocation Donut Chart (FactSet Data)</div>
+          </div>
+        </article>
+
+        <!-- Account Balances -->
+        <article class="slds-card">
+          <header class="slds-card__header slds-p-around_medium">
+            <h2 class="slds-card__header-title">
+              <span class="slds-icon_container slds-icon-standard-investment-account slds-m-right_small">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#investment_account"></use></svg>
+              </span>
+              Account Balances
+            </h2>
+          </header>
+          <div class="slds-card__body">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th class="" scope="col"><div class="slds-truncate" title="Account Name">Account Name</div></th>
+                  <th class="" scope="col"><div class="slds-truncate" title="Account Number">Account Number</div></th>
+                  <th class="" scope="col"><div class="slds-truncate" title="Balance">Balance</div></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="slds-hint-parent">
+                  <td data-label="Account Name"><div class="slds-truncate" title="Retirement Fund">Retirement Fund</div></td>
+                  <td data-label="Account Number"><div class="slds-truncate" title="****-1234">****-1234</div></td>
+                  <td data-label="Balance"><div class="slds-truncate" title="$850,000.00">$850,000.00</div></td>
+                </tr>
+                <tr class="slds-hint-parent">
+                  <td data-label="Account Name"><div class="slds-truncate" title="Taxable Brokerage">Taxable Brokerage</div></td>
+                  <td data-label="Account Number"><div class="slds-truncate" title="****-5678">****-5678</div></td>
+                  <td data-label="Balance"><div class="slds-truncate" title="$384,567.89">$384,567.89</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- On-Demand Reports -->
+        <article class="slds-card">
+          <header class="slds-card__header slds-p-around_medium">
+            <h2 class="slds-card__header-title">
+              <span class="slds-icon_container slds-icon-standard-document slds-m-right_small">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#document"></use></svg>
+              </span>
+              On-Demand Reports
+            </h2>
+          </header>
+          <div class="slds-card__body slds-card__body_inner slds-text-align_center">
+            <button class="slds-button slds-button_brand">Generate Quarterly Report</button>
+            <button class="slds-button slds-button_neutral slds-m-left_small">View Tax Documents</button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Right Column: Chatbot -->
+      <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12">
+        <article class="slds-card">
+          <header class="slds-card__header slds-p-around_medium">
+            <h2 class="slds-card__header-title">
+              <span class="slds-icon_container slds-icon-standard-live-chat slds-m-right_small">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#live_chat"></use></svg>
+              </span>
+              AI Portfolio Assistant
+            </h2>
+          </header>
+          <div class="slds-card__body slds-card__body_inner chatbot-container">
+            <div class="chatbot-messages" id="chatbotMessages">
+              <div class="message bot">Hello! How can I help you with your portfolio today?</div>
+              <!-- Messages will appear here -->
+            </div>
+            <div class="chatbot-input">
+              <input type="text" id="chatbotInput" class="slds-input" placeholder="Ask a question..." />
+              <button class="slds-button slds-button_brand" onclick="sendMessage()">Send</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+
+    function sendMessage() {
+      const messageText = chatbotInput.value.trim();
+      if (messageText === '') return;
+
+      appendMessage(messageText, 'user');
+      chatbotInput.value = '';
+
+      // Simulate bot response (replace with actual FactSet Mercury API call)
+      setTimeout(() => {
+        let botResponse = "I'm sorry, I couldn't find an answer to that.";
+        if (messageText.toLowerCase().includes('perform') && messageText.toLowerCase().includes('s&p 500')) {
+          botResponse = "Your portfolio performed +2.1% against the S&P 500 this quarter. This was driven by strong performance in your technology and healthcare holdings.";
+        } else if (messageText.toLowerCase().includes('balance')) {
+          botResponse = "Your total portfolio balance is $1,234,567.89. The Retirement Fund has $850,000.00 and the Taxable Brokerage has $384,567.89.";
+        } else if (messageText.toLowerCase().includes('asset allocation')) {
+            botResponse = "Your current asset allocation is: 60% Equities, 30% Fixed Income, and 10% Alternatives. Would you like a more detailed breakdown?";
+        }
+        appendMessage(botResponse, 'bot');
+      }, 1000);
+    }
+
+    function appendMessage(text, type) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', type);
+      messageDiv.textContent = text;
+      chatbotMessages.appendChild(messageDiv);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to bottom
+    }
+
+    // Allow sending message with Enter key
+    chatbotInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype Portfolio</title>
+    <link rel="stylesheet" href="slds-assets/styles/salesforce-lightning-design-system.min.css" />
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; 
+            position: relative; 
+        }
+        .hamburger-button {
+            position: absolute; 
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001; 
+        }
+        #nav-panel { 
+            width: 320px; 
+            height: 100%;
+            overflow-y: auto;
+            border-right: 1px solid #dddbda;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            background-color: white; 
+            z-index: 1000; 
+            transform: translateX(-100%); 
+            transition: transform 0.3s ease-in-out; 
+        }
+        #nav-panel.is-open {
+            transform: translateX(0); 
+        }
+        .nav-backdrop {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); 
+            z-index: 999; 
+        }
+        .nav-backdrop.is-visible {
+            display: block; 
+        }
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding-left: 0; 
+            margin-left: 0; 
+            width: 100%; 
+            box-sizing: border-box;
+        }
+        .prototype-display {
+            flex-grow: 1; 
+            display: flex;
+            padding: 1rem;
+            margin-top: 40px; /* Adjust if hamburger button height changes */
+        }
+        #prototype-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .prototype-description {
+            padding: 1rem;
+            border-top: 1px solid #dddbda;
+            min-height: 130px; 
+            max-height: 200px; 
+            overflow-y: auto;
+            flex-shrink: 0; 
+        }
+        .slds-nav-vertical__item .slds-nav-vertical__action {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="slds-scope">
+    <button id="hamburger-btn" class="slds-button slds-button_icon slds-button_icon-border-filled hamburger-button" title="Open Navigation">
+        <svg class="slds-button__icon" aria-hidden="true">
+            <use xlink:href="slds-assets/icons/utility-sprite/svg/symbols.svg#rows"></use>
+        </svg>
+        <span class="slds-assistive-text">Open Navigation</span>
+    </button>
+
+    <div id="nav-panel" class="slds-nav-vertical"> 
+        <div class="slds-nav-vertical__section">
+            <h2 id="entity-header" class="slds-nav-vertical__title slds-text-title_caps slds-p-around_medium">Prototypes</h2>
+            <ul id="prototype-nav-list">
+                <!-- Navigation items will be injected here by JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <div id="nav-backdrop" class="nav-backdrop"></div>
+
+    <div class="content-area">
+        <div class="prototype-display">
+            <iframe id="prototype-iframe" title="Prototype Display"></iframe>
+        </div>
+        <div class="prototype-description slds-box slds-theme_default">
+            <h3 class="slds-text-heading_medium" id="prototype-title">Select a Prototype</h3>
+            <p id="prototype-details" class="slds-m-top_small">Select a prototype from the navigation menu to view it here along with its description.</p>
+        </div>
+    </div>
+
+    <script>
+        const navPanel = document.getElementById('nav-panel');
+        const navBackdrop = document.getElementById('nav-backdrop');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        
+        const navList = document.getElementById('prototype-nav-list');
+        const iframe = document.getElementById('prototype-iframe');
+        const prototypeTitle = document.getElementById('prototype-title');
+        const prototypeDetails = document.getElementById('prototype-details');
+
+        const prototypes = [
+            {
+                id: 'proactive_updates',
+                name: 'Proactive Personalized Updates',
+                path: 'proactive_updates.html',
+                description: 'Proactive Personalized Updates: Set up automated triggers to alert clients about relevant portfolio or market events. For example, if a stock in a client’s portfolio drops by 5% in a day or if their portfolio reaches a new high, Salesforce can automatically send a tailored notification or prompt the advisor to reach out. FactSet Mercury’s data feeds can populate the alert with context (e.g. “Tech stocks are down today, but your diversified holdings cushioned the impact”), making communications timely and informative. This kind of timely, personalized outreach keeps clients feeling informed and supported, bolstering engagement and trust.'
+            },
+            {
+                id: 'interactive_client_portal',
+                name: 'Interactive Client Portals & Chatbots',
+                path: 'salesforce_components/interactive_client_portal.html',
+                description: 'Interactive Client Portals & Chatbots: Provide clients with a digital portal or mobile app that displays real-time portfolio data (performance, asset allocation, account balances) and offers self-service tools. FactSet data can power interactive charts and on-demand reports, while Salesforce FSC ensures the portal is securely linked to each client’s records. Integrating a chatbot (via the FactSet Mercury conversational API) allows clients to ask questions and get instant answers on their portfolio or market trends. For instance, a client might ask, “How did my portfolio perform against the S&P 500 this quarter?” – the Mercury-powered assistant can instantly pull performance numbers and answer in plain language. This 24/7 availability of information enhances the client experience, as clients receive instant, personalized answers instead of waiting for their advisor. It also frees up advisors from routine queries, letting them focus on higher-value conversations.'
+            },
+            {
+                id: 'automated_personalized_reports',
+                name: 'Automated Personalized Reports',
+                path: 'salesforce_components/automated_personalized_reports.html',
+                description: 'Automated Personalized Reports: Use FactSet Mercury’s AI capabilities to generate customized portfolio commentary and reports for clients at scale. Each quarter or month, the system can compile a report for each client that includes portfolio performance vs. goals, attribution analysis (what drove returns), and relevant news impacting their holdings. FactSet’s AI-powered Portfolio Commentary, for example, can produce narrative explanations of performance attribution automatically. Advisors can then review these auto-generated drafts and distribute them through Salesforce (email or portal) with minimal manual editing. This delivers a high-touch, personalized communication for every client without requiring hours of writing for each report. By offering such insightful, easy-to-understand reports, firms reinforce their value to clients and improve client retention. (Studies show that hyper-personalization in communication leads to higher client satisfaction, better retention rates, and improved profitability.)'
+            },
+            {
+                id: 'multi_channel_engagement_campaigns',
+                name: 'Multi-Channel Engagement Campaigns',
+                path: 'salesforce_components/multi_channel_engagement_campaigns.html',
+                description: 'Multi-Channel Engagement Campaigns: Salesforce FSC can segment clients by preferences and enable multi-channel communication (email, SMS, phone, social). Advisors could set up campaigns (e.g. a weekly market recap or a educational webinar invite) that are triggered by FactSet data or market conditions. For instance, if volatility spikes or interest rates change, the firm might automatically send out a brief market update to all clients with certain risk profiles. The content can be enriched with Mercury’s insights (ensuring the messaging is polished and informative), and delivered via each client’s preferred channel. Such proactive education keeps clients engaged “on their channel of choice” and reassures them during turbulent times. By meeting clients where they are and with information they care about, advisors deepen relationships and demonstrate attentiveness.'
+            },
+            {
+                id: 'goal_tracking_adjustments',
+                name: 'Goal Tracking & Real‑Time Adjustments',
+                path: 'salesforce_components/goal_tracking_adjustments.html',
+                description: 'Goal Tracking with Real-Time Adjustments: Advisors can map each client’s investments to specific financial goals in Salesforce FSC (retirement, college funding, etc.), then use FactSet data to track progress in real time. If a client’s portfolio performance veers off the required path to meet a goal (say, the retirement portfolio is now projected to fall short due to a market dip), the system flags it. Salesforce can then trigger an alert and recommended action plan – for example, an advisor task to discuss increasing contributions or adjusting the asset allocation. FactSet Mercury’s analytical engine could even forecast how different adjustments (adding $X monthly, or shifting 5% from bonds to equities) might close the gap. This ensures proactive planning; instead of waiting for an annual review, the advisor and client can course-correct promptly when data shows a goal at risk. Ultimately, this helps clients stay on track and demonstrates the advisor’s attentiveness to their personal goals.'
+            },
+            {
+                id: 'life_event_advice',
+                name: 'Life Event–Driven Advice',
+                path: 'salesforce_components/life_event_advice.html',
+                description: 'Life Event–Driven Advice: Leverage the life events and milestones tracked in Salesforce to automatically prompt tailored financial advice. For example, when a client gets married, has a child, or sells a business (entered as a life event on their Salesforce record), the system can initiate related planning workflows. A new child might trigger a college savings plan recommendation; a business sale might prompt tax/estate planning outreach. FactSet Mercury can be used to model scenarios around these events – e.g. calculating future education costs for a newborn’s college fund or analyzing investment options after a liquidity event – and produce talking points or recommendations for the advisor. By integrating these workflows, the client receives timely advice precisely when life changes occur, which reinforces that the advisor understands and cares about their individual situation. This kind of highly relevant, just-in-time advice is a hallmark of effective personalization and is proven to deepen client trust.'
+            },
+            {
+                id: 'customized_investment_recommendations',
+                name: 'Customized Investment Recommendations',
+                path: 'salesforce_components/customized_investment_recommendations.html',
+                description: 'Customized Investment Recommendations: FactSet’s rich market data and Mercury’s AI can help advisors craft investment proposals tailored to each client’s profile. Instead of generic model portfolios, the advisor can input a client’s specific constraints and preferences – say a desire for ESG investments, a concentration in tech stocks, or a need for liquidity – and use Mercury to sift through thousands of options to find the best fits. For instance, Mercury might analyze a client’s current holdings and identify that they have an overweight in U.S. equities and no exposure to emerging markets. It could then suggest a few funds or securities to improve diversification, complete with data-backed rationale. These suggestions flow into Salesforce as proposed actions or even directly into a client-facing proposal document. One wealth manager increased engagement by using analytics to micro-segment clients and offer such bespoke insights and product suggestions, aligning investments more closely with each client’s goals and values. The result is an investment plan that each client feels is uniquely built for them, which is invaluable for satisfaction and retention.'
+            },
+            {
+                id: 'dynamic_financial_plans',
+                name: 'Dynamic Plans & What‑If Scenarios',
+                path: 'salesforce_components/dynamic_financial_plans.html',
+                description: 'Dynamic Financial Plans & “What-If” Scenarios: Advisors can maintain dynamic financial plans that adjust as markets move. By linking FactSet’s market and economic data with planning assumptions in Salesforce, the plan can automatically update projections (e.g. if interest rates rise, the plan might show a change in projected retirement income). Advisors can also run what-if scenarios using FactSet (for example, “What if there’s a 20% market drop next year?” or “What if the client buys a $2M vacation home in 5 years?”) and instantly see the impact on the client’s plan. Salesforce can present these scenarios in an interactive way to clients – perhaps via the client portal or during review meetings – to facilitate discussion. This integration of data makes financial planning a living, breathing process rather than a static annual document. Clients get a clearer picture of how decisions or market events affect their personal outcomes, and advisors can collaboratively adjust plans with the client. Such data-driven, personalized planning helps deliver better outcomes and peace of mind, reinforcing the value of the advisory relationship.'
+            },
+            {
+                id: 'wallet_share_analysis',
+                name: 'Wallet Share & Held-Away Assets',
+                path: 'salesforce_components/wallet_share_analysis.html',
+                description: 'Wallet Share and “Held Away” Asset Analysis: Often, high-net-worth clients have only a portion of their assets with a given firm. By combining internal account data with external estimates (for example, data from FactSet about a client’s stock holdings or executive compensation at their company), advisors can gauge each client’s total wealth and calculate “wallet share” – the percentage of that wealth managed by the firm. Salesforce dashboards can display this clearly (as in the image above), highlighting clients who have significant “assets held away.” These insights let advisors prioritize who to approach for consolidation. Even a small increase in wallet share from top clients can translate to millions in new AUM. In fact, leading firms are using analytics to identify such “hidden affluence” among their clients. By proactively offering to manage outside holdings (like rolled-over 401(k)s, stock option proceeds, or cash from a business sale), advisors both grow their business and simplify the client’s financial life – a win-win with obvious ROI.'
+            },
+            {
+                id: 'automated_cross_sell_recommendations',
+                name: 'Automated Cross‑Sell Recommendations',
+                path: 'salesforce_components/automated_cross_sell_recommendations.html',
+                description: 'Automated Cross-Sell Recommendations: A unified data platform can reveal gaps in a client’s product usage and generate cross-selling opportunities. For example, Salesforce FSC might show that a wealthy client has investment accounts but no trust or estate plan in place with the firm. Or perhaps multiple clients in a segment don’t have a certain insurance product that peers of similar profile usually carry. By applying AI to demographic and behavioral data, the system can suggest the “next best product” for each client. Advisors can receive these recommendations as tasks or insights in their dashboard (e.g. “Client X might benefit from a family trust – similar clients have set these up”). Salesforce can even automate parts of the outreach: for instance, if a client is flagged for a new lending product, it could trigger a personalized email campaign about lending solutions, followed by an advisor follow-up. This data-driven cross-selling ensures clients hear about relevant services at the right time, increasing product per client. RBC Wealth Management saw that giving advisors a full view of client data and analytics led to more cross-sell opportunities and growth in products per client. More products per relationship not only boosts revenue but also deepens client loyalty (as their needs are being comprehensively addressed by one firm).'
+            },
+            {
+                id: 'lead_generation_external_events',
+                name: 'Lead Generation – External Events',
+                path: 'salesforce_components/lead_generation_external_events.html',
+                description: 'Lead Generation from External Events: FactSet Mercury can monitor thousands of news sources and market data points; this can be harnessed to spot prospective client opportunities or upsell moments. For example, Mercury might catch that a local executive (perhaps already in the firm’s prospect list in Salesforce) just had a significant liquidity event – such as selling their company or their stock shooting up after an earnings beat. Salesforce can automatically create an alert or task for the relevant advisor: “Prospect Jane Doe at Acme Co. received $5M in stock options – consider reaching out about wealth management.” Similarly, Mercury could flag when an existing client’s company IPOs or they inherit assets (via news or public filings), prompting the advisor to offer guidance on investing those new funds. This approach is essentially an early warning system for sales, ensuring the firm acts on external triggers quickly. By embedding these alerts in the CRM, the outreach can be timely and personalized (“Congrats on the IPO – let’s discuss a plan for your new assets”), which greatly increases the chance of winning the business. In a competitive market, being the first to know and act on such information can be the difference in capturing new AUM.'
+            },
+            {
+                id: 'segmentation_targeted_campaigns',
+                name: 'Segmentation & Targeted Campaigns',
+                path: 'salesforce_components/segmentation_targeted_campaigns.html',
+                description: 'Segmentation and Targeted Marketing Campaigns: Using Salesforce’s analytics, the firm can segment clients and prospects based on rich data (financial profiles, interests, life stage, etc.) and run targeted growth campaigns. For instance, analytics might identify a segment of mid-career tech professionals who are rapidly accumulating wealth (through stock compensation). The firm could create a campaign (emails, webinars, events) focused on “Tech Wealth Planning” targeting this segment, with content curated by FactSet (market trends in tech, stock option tax planning tips, etc.). The integration allows campaign performance to feed back into Salesforce – showing which clients engaged – and advisors can follow up individually armed with that insight. Another example: identify top clients who have referred business in the past and automatically prompt relationship managers to request referrals at regular intervals, perhaps when those clients hit portfolio milestones. According to industry research, data-driven personalization in marketing can boost client acquisition and conversion significantly. By focusing business development efforts where data shows a high propensity or need, advisors maximize their hit rate and marketing ROI.'
+            },
+            {
+                id: 'unified_client_view',
+                name: '360° Client Dashboard',
+                path: 'salesforce_components/unified_client_view.html',
+                description: 'Unified 360° Client View: By integrating custody/brokerage data (positions, transactions, performance) into Salesforce FSC via APIs, advisors get a single dashboard with all relevant client information. No more logging into one system for performance reports, another for CRM notes, and a third for financial planning – it’s all connected. This not only saves time, but ensures decisions are made with full context. For instance, before calling a client, an advisor can see in one view the client’s latest portfolio performance, any service issues or open tasks, recent communications, and even FactSet-driven analytics like risk scores or portfolio drift. Having this comprehensive data readily available means advisors can be better prepared and more productive – in RBC’s case, advisors freed up hours that were reallocated to serving clients and prospecting. Moreover, management can also get aggregated views (by branch, by advisor) of key performance indicators like total AUM, revenue, and client satisfaction, aiding strategic decisions. In short, a unified platform grounded in data allows faster, data-driven decision-making at all levels of the firm.'
+            },
+            {
+                id: 'workflow_automation_center',
+                name: 'Workflow Automation & Tasks',
+                path: 'salesforce_components/workflow_automation_center.html',
+                description: 'Workflow Automation and Advisor Productivity: Salesforce FSC’s workflow engine can automate routine processes that advisors or support staff used to do manually. When combined with FactSet data triggers, this becomes very powerful. For example, the system can automatically generate tasks or reminders based on portfolio data – if FactSet indicates a portfolio is out of its target allocation range, a “Rebalancing Review” task is created for the advisor. If an important account document is about to expire, a compliance task is triggered to update it. Advisors can also use pre-built action plan templates (as shown in Salesforce’s “Action Plans”) for common processes like onboarding or annual reviews, which automatically create checklists and assign tasks. This level of automation not only cuts down errors and things slipping through the cracks, but dramatically reduces the time advisors spend on administrative follow-ups. One example from RBC: advisors are alerted if they’re overdue to contact a priority client, and with one click they can schedule a meeting, with the system handling the email invitation and calendar logistics. By delegating routine work to the system, advisors focus on high-value activities – meeting clients, devising strategy – which improves both productivity and job satisfaction. Over a large team, these efficiency gains translate to significant ROI (more clients can be handled per advisor, or more prospects contacted with the same staff).'
+            },
+            {
+                id: 'ai_research_assistant',
+                name: 'AI Research & Decision Support',
+                path: 'salesforce_components/ai_research_assistant.html',
+                description: 'AI-Driven Research and Decision Support: FactSet Mercury essentially provides a virtual research assistant that advisors can tap directly within their workflow. Instead of spending hours scouring reports or financial statements, an advisor could ask Mercury a question in natural language and get a well-researched answer. For instance: “Explain why Client X’s portfolio underperformed the S&P this month” might prompt Mercury to analyze the portfolio’s holdings, compare to benchmarks, and return a summary like “Underperformance was mainly due to overweight in emerging markets which fell 5%, and specifically a drop in ABC Corp stock – see attached attribution analysis.” The advisor gets immediate insight without manual number-crunching. Advisors could also use Mercury for market research (e.g. “What are the recent trends in renewable energy stocks?”) and instantly get curated, up-to-date intelligence to inform their recommendations. By integrating this into Salesforce (e.g., through a Lightning component or Slack with Salesforce and Mercury), the Q&A and results can even be attached to client records or advisor notes for future reference. This AI assistance accelerates decision-making – advisors can explore options and get analysis in minutes rather than waiting days for an analyst report. The end result is quicker turnaround on client requests and more confident, data-backed advice. (In practice, firms that have adopted AI tools in wealth management have seen productivity boosts on the order of 20–30%, as routine analysis is offloaded to machines and humans focus on judgment and relationships.)'
+            },
+            {
+                id: 'management_analytics_dashboard',
+                name: 'Analytics for Management Decisions',
+                path: 'salesforce_components/management_analytics_dashboard.html',
+                description: 'Analytics for Management Decisions: The combination of Salesforce and FactSet also produces a wealth of data that management can analyze for strategic decisions. With all client interactions and portfolio metrics in one place, managers can run advanced analytics to find patterns – for example, which client segments are most profitable, which advisory teams are most efficient, or which services correlate with higher client retention. Dashboards might show, say, that clients who receive quarterly financial plan updates have 30% higher retention than those who don’t – informing the firm to standardize that practice. Or analytics might reveal that a certain investment strategy outperforms others for clients in a particular risk tier, prompting the firm to train all advisors on that strategy. On the operations side, having real-time data on advisor activities and outcomes allows quick adjustments (like reallocating resources to high-growth regions). In essence, the firm cultivates a data-driven culture where decisions from the front line to the C-suite are supported by evidence and insights. This can improve everything from marketing effectiveness to compliance oversight. The ROI is seen in better allocation of budget and effort – focusing on initiatives that data shows will yield results, and scaling back on those that don’t.'
+            },
+            {
+                id: 'real_time_portfolio_risk_alerts',
+                name: 'Real‑Time Portfolio Risk Alerts',
+                path: 'salesforce_components/real_time_portfolio_risk_alerts.html',
+                description: 'Real-Time Portfolio Risk Alerts: FactSet’s risk analytics (e.g. volatility, Value-at-Risk, beta, credit ratings, etc.) can be applied to each client portfolio and fed into Salesforce as live risk indicators. Advisors (and clients, if appropriate) can then receive alerts when risk thresholds are breached. For example, if a portfolio becomes too concentrated in one stock or sector (beyond the firm’s or the client’s risk policy), the system flags it. Or if the portfolio’s projected volatility exceeds the client’s risk tolerance, an alert is triggered. Another scenario: FactSet can watch specific risk events – say a bond in the portfolio gets downgraded or a company’s ESG score drops – and Salesforce can automatically notify the advisor to review the holding. By continuously monitoring these factors, the platform ensures advisors are immediately aware of emerging risks that could harm the client’s objectives. They can then take action (rebalancing, hedging, communicating with the client) to mitigate the issue. This kind of early warning system is analogous to those used in banking for credit risk, but here applied to investment portfolios – it transforms risk management from a periodic check to a daily, data-driven safety net. The ROI is seen in avoided losses and crises: preventing even one major portfolio drawdown or compliance mishap can justify the investment in such tooling.'
+            },
+            {
+                id: 'performance_deviation_attribution',
+                name: 'Performance Deviation & Attribution',
+                path: 'salesforce_components/performance_deviation_attribution.html',
+                description: 'Performance Deviation & Attribution Analysis: When a client portfolio underperforms its benchmark or target for a period, identifying why quickly is crucial (both to fix it and to explain it to the client). By integrating FactSet’s performance attribution data, the system can automatically detect significant underperformance (e.g., lagging the benchmark by more than 2% in a quarter) and immediately analyze the causes. FactSet Mercury can generate a concise explanation, such as “Portfolio X underperformed due to overweight in small-cap value stocks which faced a downturn, while the benchmark’s large-cap growth allocation did well. Currency movements also negatively impacted returns by 0.5%.” This narrative can be attached to an alert in Salesforce for the advisor. With this insight in hand, the advisor can promptly decide on corrective measures (rebalance the allocations, replace an underperforming fund, etc.) and proactively reach out to the client with a clear explanation. Rather than the client calling in surprise about poor performance, the advisor is ahead of the curve, demonstrating diligence and expertise. This not only manages the investment risk but also the relationship risk – transparency and timely action help maintain client confidence even when performance dips. In short, automated attribution analysis turns a potentially damaging surprise into a manageable conversation and action plan.'
+            },
+            {
+                id: 'automated_compliance_monitoring',
+                name: 'Compliance & Regulatory Alerts',
+                path: 'salesforce_components/automated_compliance_monitoring.html',
+                description: 'Automated Compliance and Regulatory Monitoring: High-net-worth accounts must also be monitored for various compliance risks – from suitability and fiduciary adherence to anti-money-laundering (AML) flags. By linking client and transaction data in Salesforce with external data from FactSet and other sources, firms can implement early warning systems for compliance. For instance, Salesforce can track if an investment in a client’s account strays outside their documented risk profile or Investment Policy Statement and immediately alert compliance officers. FactSet Mercury could scan negative news about companies held by clients (e.g., legal troubles, sanctions) and flag any accounts holding those securities for review. It can also help verify identity and check client backgrounds continuously (KYC), as AI can monitor various databases for issues. AI-based tools are already used to detect fraud and AML risks by spotting anomalous patterns in large datasets – wealth management firms can apply similar techniques to catch suspicious account activities (like unusually large withdrawals or transfers) early. All alerts and actions can be logged in Salesforce, creating a clear audit trail. By automating these compliance checks and connecting data sources, the firm reduces the chance of overlooking a red flag and can address potential issues before they become serious problems. The ROI here is less direct but hugely important – avoiding fines, legal costs, and reputational damage by staying ahead of regulatory risks, and saving the enormous staff time that manual compliance reviews would otherwise require.'
+            },
+            {
+                id: 'scenario_analysis_stress_testing',
+                name: 'Scenario Analysis & Stress Testing',
+                path: 'salesforce_components/scenario_analysis_stress_testing.html',
+                description: 'Scenario Analysis & Stress Testing: FactSet’s robust analytical tools can simulate how extreme market events would impact each client’s portfolio. By running these stress tests (e.g. a 2008-like financial crisis, or a rapid interest rate spike) and integrating the results into Salesforce, advisors can see which client portfolios are most vulnerable under each scenario. The platform could automatically highlight, for example, a list of clients who would lose more than a certain percentage of their portfolio in a stress scenario. Advisors can then reach out to those clients to discuss fortifying their strategy (perhaps increasing diversification or adding downside protection). This pre-emptive approach is key to risk management – rather than waiting for a market shock to hurt clients, the firm addresses potential weaknesses in advance. It’s akin to a health check for portfolios under various “worst-case” assumptions. Moreover, the results can be turned into insightful client-facing reports (with Mercury’s help to explain in plain language, “In a severe recession scenario, your portfolio might drop X%; we recommend considering some adjustments to be more resilient”). Clients appreciate this level of foresight, and it reinforces the advisor’s role as a risk manager for their wealth. From a business standpoint, avoiding large client losses in a downturn also protects the firm’s revenue (since AUM-based fees won’t plummet as much) and protects the relationship (clients are less likely to leave if they feel their advisor navigated the storm well).'
+            },
+            {
+                id: 'portfolio_drift_quality_control',
+                name: 'Portfolio Drift & Quality Control',
+                path: 'salesforce_components/portfolio_drift_quality_control.html',
+                description: 'Portfolio Drift and Quality Control: Finally, data integration allows continuous monitoring of each portfolio for drift from target allocation or strategy guidelines. If a client’s target is 60/40 stock-bond but due to market movements they’re now 70/30, Salesforce can flag this for rebalancing. Similarly, if FactSet data shows a security in the portfolio has been downgraded in quality (like a bond’s credit rating or a stock’s analyst scores), the system could tag it for review or replacement. Mercury’s AI might even suggest replacement candidates (e.g. “Bond ABC was downgraded; consider switching to Bond XYZ with similar yield and higher rating”). Automating these quality-control checks means potential issues (whether it’s simply portfolio drift or a problematic holding) are caught early, not at quarter-end. Advisors can then address them in regular portfolio maintenance, keeping each client’s investments in line with their objectives and the firm’s standards. This not only mitigates risk but also improves performance consistency over time – portfolios remain aligned to their intended risk/return profiles, which leads to better long-term outcomes. The scalable benefit is huge: instead of each advisor manually combing through accounts, the system scans all accounts continuously and surfaces only those needing attention. This ensures no account is overlooked and enables even a lean advisory team to manage a large number of portfolios effectively, with confidence that if something goes awry, they will know in time to fix it.'
+            }
+        ];
+
+        const categories = [
+            {
+                name: "Client Engagement & Communication",
+                prototypeIds: [
+                    'proactive_updates',
+                    'interactive_client_portal',
+                    'automated_personalized_reports',
+                    'multi_channel_engagement_campaigns'
+                ]
+            },
+            {
+                name: "Personalized Investment & Financial Planning",
+                prototypeIds: [
+                    'goal_tracking_adjustments',
+                    'life_event_advice',
+                    'customized_investment_recommendations',
+                    'dynamic_financial_plans'
+                ]
+            },
+            {
+                name: "Business Development & Client Growth",
+                prototypeIds: [
+                    'wallet_share_analysis',
+                    'automated_cross_sell_recommendations',
+                    'lead_generation_external_events',
+                    'segmentation_targeted_campaigns'
+                ]
+            },
+            {
+                name: "Internal Efficiency & Decision-Making",
+                prototypeIds: [
+                    'unified_client_view',
+                    'workflow_automation_center',
+                    'ai_research_assistant',
+                    'management_analytics_dashboard'
+                ]
+            },
+            {
+                name: "Risk Management & Early Issue Identification",
+                prototypeIds: [
+                    'real_time_portfolio_risk_alerts',
+                    'performance_deviation_attribution',
+                    'automated_compliance_monitoring',
+                    'scenario_analysis_stress_testing',
+                    'portfolio_drift_quality_control'
+                ]
+            }
+        ];
+
+        function toggleNav() {
+            if (!navPanel || !navBackdrop || !hamburgerBtn) return; 
+
+            navPanel.classList.toggle('is-open');
+            navBackdrop.classList.toggle('is-visible');
+            
+            const iconUse = hamburgerBtn.querySelector('use');
+            const assistiveText = hamburgerBtn.querySelector('.slds-assistive-text');
+
+            if (navPanel.classList.contains('is-open')) {
+                iconUse.setAttribute('xlink:href', 'slds-assets/icons/utility-sprite/svg/symbols.svg#close');
+                hamburgerBtn.title = "Close Navigation";
+                if (assistiveText) assistiveText.textContent = "Close Navigation";
+            } else {
+                iconUse.setAttribute('xlink:href', 'slds-assets/icons/utility-sprite/svg/symbols.svg#rows');
+                hamburgerBtn.title = "Open Navigation";
+                if (assistiveText) assistiveText.textContent = "Open Navigation";
+            }
+        }
+
+        if (hamburgerBtn) hamburgerBtn.addEventListener('click', toggleNav);
+        if (navBackdrop) navBackdrop.addEventListener('click', toggleNav);
+
+        function loadPrototype(prototypeId) {
+            const selectedPrototype = prototypes.find(p => p.id === prototypeId);
+            if (selectedPrototype) {
+                iframe.src = selectedPrototype.path;
+                prototypeTitle.textContent = selectedPrototype.name;
+                prototypeDetails.textContent = selectedPrototype.description;
+
+                document.querySelectorAll('#nav-panel .slds-nav-vertical__item').forEach(item => { // Ensure querySelectorAll is specific to navPanel
+                    item.classList.remove('slds-is-active');
+                });
+                const activeNavItem = document.querySelector(`#nav-panel li[data-id="\${prototypeId}"]`); // Ensure querySelector is specific to navPanel
+                if (activeNavItem) {
+                    activeNavItem.classList.add('slds-is-active');
+                }
+                
+                if (navPanel && navPanel.classList.contains('is-open')) { 
+                    toggleNav();
+                }
+            }
+        }
+
+        // Clear existing nav items
+        if (navList) navList.innerHTML = '';
+
+        // Add "Back to All Categories" link
+        const backLinkLi = document.createElement('li');
+        backLinkLi.classList.add('slds-nav-vertical__item');
+        const backLinkA = document.createElement('a');
+        backLinkA.classList.add('slds-nav-vertical__action');
+        backLinkA.href = 'splash.html';
+        backLinkA.textContent = '« Back to All Categories';
+        backLinkA.style.fontWeight = 'bold';
+        backLinkA.style.marginBottom = '1rem';
+        backLinkLi.appendChild(backLinkA);
+        if (navList) navList.appendChild(backLinkLi);
+
+
+        categories.forEach(category => {
+            const categoryHeader = document.createElement('h3');
+            categoryHeader.classList.add('slds-nav-vertical__title', 'slds-text-title_caps', 'slds-p-around_small');
+            categoryHeader.style.fontSize = '0.875rem'; // Slightly smaller for sub-category
+            categoryHeader.style.marginTop = '1rem'; // Add some space above category headers
+            categoryHeader.textContent = category.name;
+            if (navList) navList.appendChild(categoryHeader);
+
+            category.prototypeIds.forEach(protoId => {
+                const proto = prototypes.find(p => p.id === protoId);
+                if (proto) {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('slds-nav-vertical__item');
+                    listItem.setAttribute('data-id', proto.id);
+
+                    const link = document.createElement('a');
+                    link.classList.add('slds-nav-vertical__action');
+                    link.textContent = proto.name;
+                    link.onclick = () => loadPrototype(proto.id);
+                    
+                    listItem.appendChild(link);
+                    if (navList) navList.appendChild(listItem);
+                }
+            });
+        });
+
+        if (prototypes.length > 0) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const prototypeIdFromUrl = urlParams.get('prototype');
+            if (prototypeIdFromUrl && prototypes.find(p => p.id === prototypeIdFromUrl)) {
+                loadPrototype(prototypeIdFromUrl);
+            } else {
+                loadPrototype(prototypes[0].id);
+            }
+        }
+    </script>
+</body>
+</html>

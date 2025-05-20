@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Customized Investment Recommendations</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+
+  <!-- 3. Customized Investment Recommendations -->
+  <article class="slds-card" id="invRecoCard">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-solution" title="Recommendations">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#solution"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Customized Investment Recommendations</h2>
+          <p class="slds-text-body_small">AI‑generated, client‑specific proposals</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <h3 class="slds-text-heading_small">Client Profile Snapshot</h3>
+          <ul class="slds-list_dotted" id="profileList"></ul>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+          <h3 class="slds-text-heading_small">Recommended Adjustments</h3>
+          <table class="slds-table slds-table_fixed-layout slds-table_bordered" role="grid">
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th><div class="slds-truncate">Ticker / Fund</div></th>
+                <th><div class="slds-truncate">Rationale</div></th>
+                <th><div class="slds-truncate">Action</div></th>
+              </tr>
+            </thead>
+            <tbody id="recoTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <template id="recoRowTmpl">
+    <tr>
+      <td class="ticker"></td>
+      <td class="rationale"></td>
+      <td><button class="slds-button slds-button_neutral">Add to Proposal</button></td>
+    </tr>
+  </template>
+
+  <script>
+    // Demo data for Investment Recommendations
+    const profile={risk:'Balanced',esg:true,liquidity:'Medium',concentration:'Tech 35%'};
+    const recos=[{ticker:'EEM','rationale':'Add EM exposure to diversify beyond US equities.'},{ticker:'AGG','rationale':'Increase bond allocation for capital preservation.'}];
+
+    // Profile list
+    const profList=document.getElementById('profileList');
+    if (profList) {
+        Object.entries(profile).forEach(([k,v])=>{
+          profList.insertAdjacentHTML('beforeend',`<li><strong>\${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> \${v}</li>`);
+        });
+    }
+
+    // Reco table
+    const recoBody=document.getElementById('recoTable');
+    const recoTmpl=document.getElementById('recoRowTmpl').content;
+    if (recoBody && recoTmpl) {
+        recos.forEach(r=>{
+          const row=recoTmpl.cloneNode(true);
+          row.querySelector('.ticker').textContent=r.ticker;
+          row.querySelector('.rationale').textContent=r.rationale;
+          recoBody.appendChild(row);
+        });
+    }
+  </script>
+</body>
+</html>

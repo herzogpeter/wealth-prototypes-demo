@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lead Generation - External Events Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .badge-yellow{background:#ffb75d;color:#000;}
+    .badge-green{background:#6ec664;color:#fff;}
+  </style>
+</head>
+<body>
+
+  <!-- 3. Lead Generation from External Events -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-endorsement" title="External Events">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#endorsement"></use></svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Lead Generation – External Events</h2>
+          <p class="slds-text-body_small">Real‑time triggers from FactSet Mercury</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+        <thead><tr><th>Date</th><th>Prospect / Client</th><th>Event</th><th>Opportunity</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="leadTable"></tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- Templates -->
+  <template id="leadRow"><tr><td class="date"></td><td class="name"></td><td class="event"></td><td class="opp"></td><td><span class="status slds-badge"></span></td><td><button class="slds-button slds-button_neutral">Follow Up</button></td></tr></template>
+
+  <script>
+    // Demo datasets
+    const leads=[{date:'2025‑05‑18',name:'Jane Doe',event:'IPO Liquidity $5M',opp:'New AUM',status:'New'},{date:'2025‑05‑17',name:'Elon B',event:'Stock Surge +30%',opp:'Options Strategy',status:'Contacted'}];
+
+    // Lead table
+    const lBody=document.getElementById('leadTable');
+    const lTmpl=document.getElementById('leadRow').content;
+    leads.forEach(r=>{const row=lTmpl.cloneNode(true);row.querySelector('.date').textContent=r.date;row.querySelector('.name').textContent=r.name;row.querySelector('.event').textContent=r.event;row.querySelector('.opp').textContent=r.opp;const st=row.querySelector('.status');st.textContent=r.status;st.classList.add(r.status==='New'?'badge-yellow':'badge-green');lBody.appendChild(row);});
+  </script>
+</body>
+</html>

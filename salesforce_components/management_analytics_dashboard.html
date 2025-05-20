@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Management Analytics Dashboard Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .kpi {font-size:1.5rem;font-weight:700;}
+  </style>
+</head>
+<body>
+  <!-- 4. Management Analytics Dashboard -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><div class="slds-media slds-media_center"><div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-dashboard"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#dashboard"></use></svg></span></div><div class="slds-media__body"><h2 class="slds-card__header-title slds-truncate">Analytics for Management Decisions</h2><p class="slds-text-body_small">KPIs by Branch & Advisor</p></div></div></header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"><div class="kpi" id="kpiAUM">$3.8B</div><p>Total AUM</p></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"><div class="kpi" id="kpiRev">$24M</div><p>YTD Revenue</p></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"><div class="kpi" id="kpiRet">92%</div><p>Client Retention</p></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12"><img src="https://dummyimage.com/500x140/ffffff/808080&text=Branch+Performance+Chart" style="width:100%"></div>
+      </div>
+    </div>
+  </article>
+</body>
+</html>

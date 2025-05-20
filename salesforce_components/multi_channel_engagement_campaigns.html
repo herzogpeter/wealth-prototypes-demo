@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi-Channel Engagement Campaigns</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body { padding: 1rem; background: #f3f2f2; }
+    .status-draft { background:#FFB75D; }
+    .status-active { background:#6EC664; }
+    .status-paused { background:#00A1E0; }
+    .status-complete { background:#706E6B; }
+  </style>
+</head>
+<body>
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-campaign" title="Campaigns">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#campaign"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate" title="Multi-Channel Engagement Campaigns">Multi-Channel Engagement Campaigns</h2>
+          <p class="slds-text-body_small">Segment, automate & deliver insights across Email, SMS, and more</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Controls -->
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-vertical_x-small">
+      <div class="slds-grid slds-wrap slds-grid_align-spread slds-gutters_small">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="filter-seg">Segment</label>
+            <div class="slds-form-element__control">
+              <div class="slds-select_container">
+                <select class="slds-select" id="filter-seg">
+                  <option value="all">All</option>
+                  <option value="conservative">Conservative Risk</option>
+                  <option value="balanced">Balanced</option>
+                  <option value="aggressive">Aggressive Risk</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="filter-status">Status</label>
+            <div class="slds-form-element__control">
+              <div class="slds-select_container">
+                <select class="slds-select" id="filter-status">
+                  <option value="all">All</option>
+                  <option value="draft">Draft</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="complete">Complete</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
+          <button class="slds-button slds-button_brand" id="btn-new">New Campaign</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaigns Table -->
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-scrollable_y" style="max-height:400px;">
+        <table class="slds-table slds-table_fixed-layout slds-table_bordered slds-table_col-bordered" role="grid" id="campTable">
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col"><div class="slds-truncate" title="Campaign">Campaign</div></th>
+              <th scope="col"><div class="slds-truncate" title="Trigger">Trigger</div></th>
+              <th scope="col"><div class="slds-truncate" title="Channels">Channels</div></th>
+              <th scope="col"><div class="slds-truncate" title="Status">Status</div></th>
+              <th scope="col"><div class="slds-truncate" title="Actions">Actions</div></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </article>
+
+  <!-- Preview Modal -->
+  <section class="slds-modal" tabindex="-1" role="dialog" id="previewModal" aria-modal="true" style="display:none;">
+    <div class="slds-modal__container" style="max-width:60rem;">
+      <header class="slds-modal__header">
+        <h2 class="slds-text-heading_medium" id="modalHeading">Campaign Preview</h2>
+        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick="closeModal()">
+          <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+            <use xlink:href="../slds-assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+          </svg>
+        </button>
+      </header>
+      <div class="slds-modal__content slds-p-around_medium" id="modalBody">
+        <!-- Content added dynamically -->
+      </div>
+      <footer class="slds-modal__footer">
+        <button class="slds-button slds-button_neutral" onclick="closeModal()">Close</button>
+        <button class="slds-button slds-button_brand" id="btn-launch">Launch</button>
+      </footer>
+    </div>
+  </section>
+  <div class="slds-backdrop" id="backdrop" style="display:none;"></div>
+
+  <!-- Table Row Template -->
+  <template id="rowTemplate">
+    <tr>
+      <td><div class="slds-truncate campName"></div></td>
+      <td><div class="slds-truncate trigger"></div></td>
+      <td><div class="slds-truncate channels"></div></td>
+      <td><span class="slds-badge status"></span></td>
+      <td>
+        <button class="slds-button slds-button_neutral btn-preview">Preview</button>
+        <button class="slds-button slds-button_neutral btn-edit">Edit</button>
+      </td>
+    </tr>
+  </template>
+
+  <script>
+    const statusCls = { draft:'status-draft', active:'status-active', paused:'status-paused', complete:'status-complete' };
+    const campaigns = [
+      { id:1, name:'Volatility Spike Update', trigger:'VIX > 25', seg:'balanced', channels:['Email','SMS'], status:'active', content:{ email:'Market volatility has spiked...', sms:'Volatility alert – check your inbox for details.' } },
+      { id:2, name:'Weekly Market Recap', trigger:'Every Friday 16:00', seg:'all', channels:['Email'], status:'draft', content:{ email:'Here is your weekly recap...' } },
+      { id:3, name:'Fed Rate Change Alert', trigger:'Fed Rate Hike', seg:'conservative', channels:['Email','Phone'], status:'paused', content:{ email:'The Federal Reserve has raised rates...', phone:'Call script: Discuss rate impacts on fixed income.' } }
+    ];
+
+    const tbody = document.querySelector('#campTable tbody');
+    const tmpl = document.getElementById('rowTemplate').content;
+
+    function renderTable() {
+      tbody.innerHTML = '';
+      campaigns.forEach(c => {
+        const row = tmpl.cloneNode(true);
+        row.querySelector('.campName').textContent = c.name;
+        row.querySelector('.trigger').textContent = c.trigger;
+        row.querySelector('.channels').textContent = c.channels.join(', ');
+        const st = row.querySelector('.status');
+        st.textContent = c.status.charAt(0).toUpperCase()+c.status.slice(1);
+        st.classList.add(statusCls[c.status]);
+        row.querySelector('.btn-preview').addEventListener('click', ()=>openModal(c));
+        row.querySelector('.btn-edit').addEventListener('click', ()=>editCampaign(c.id));
+        tbody.appendChild(row);
+      });
+    }
+
+    function openModal(camp) {
+      let html = `<h3 class="slds-text-heading_small">\${camp.name} – Preview</h3>`;
+      html += '<div class="slds-tabs_default slds-m-top_medium">';
+      html += '<ul class="slds-tabs_default__nav" role="tablist">';
+      camp.channels.forEach((ch,idx)=>{
+        html += `<li class="slds-tabs_default__item \${idx===0?'slds-is-active':''}" role="presentation">
+                    <a class="slds-tabs_default__link" href="#tab-\${idx}" role="tab" tabindex="0">\${ch}</a>
+                  </li>`;
+      });
+      html += '</ul>';
+      camp.channels.forEach((ch,idx)=>{
+        html += `<div id="tab-\${idx}" class="slds-tabs_default__content \${idx===0?'slds-show':'slds-hide'}" role="tabpanel">
+                    <pre>\${camp.content[ch.toLowerCase()]||'No preview available.'}</pre>
+                  </div>`;
+      });
+      html += '</div>';
+      document.getElementById('modalBody').innerHTML = html;
+      // Simple tab toggle
+      document.querySelectorAll('.slds-tabs_default__link').forEach(link=>{
+        link.addEventListener('click',e=>{
+          e.preventDefault();
+          const id = link.getAttribute('href');
+          link.parentElement.parentElement.querySelectorAll('.slds-tabs_default__item').forEach(li=>li.classList.remove('slds-is-active'));
+          link.parentElement.classList.add('slds-is-active');
+          link.parentElement.parentElement.parentElement.querySelectorAll('.slds-tabs_default__content').forEach(div=>div.classList.add('slds-hide'));
+          document.querySelector(id).classList.remove('slds-hide');
+        });
+      });
+      document.getElementById('btn-launch').onclick = ()=>launchCampaign(camp.id);
+      document.getElementById('previewModal').style.display='block';
+      document.getElementById('backdrop').style.display='block';
+    }
+
+    function closeModal(){
+      document.getElementById('previewModal').style.display='none';
+      document.getElementById('backdrop').style.display='none';
+    }
+
+    function launchCampaign(id){
+      console.log('Launch campaign',id); // Replace with Apex/Flow call
+      const c = campaigns.find(x=>x.id===id);
+      if(c){ c.status='active'; renderTable(); }
+      closeModal();
+    }
+
+    function editCampaign(id){
+      console.log('Edit campaign',id); // Navigate or open edit modal
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>

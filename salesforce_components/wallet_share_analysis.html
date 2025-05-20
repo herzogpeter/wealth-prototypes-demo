@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wallet Share & Held-Away Assets Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .badge-red{background:#ea001e;color:#fff;}
+    .badge-yellow{background:#ffb75d;color:#000;}
+    .badge-green{background:#6ec664;color:#fff;}
+  </style>
+</head>
+<body>
+
+  <!-- 1. Wallet Share & Held Away Analysis -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-account" title="Wallet Share">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#account"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Wallet Share & Held-Away Assets</h2>
+          <p class="slds-text-body_small">Identify hidden affluence & prioritize consolidation</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+        <thead><tr><th>Client</th><th>Managed AUM</th><th>Estimated Total Wealth</th><th>Wallet Share</th><th>Held Away</th><th>Action</th></tr></thead>
+        <tbody id="walletTable"></tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- Templates -->
+  <template id="walletRow"><tr><td class="client"></td><td class="aum"></td><td class="wealth"></td><td><span class="wallet"></span></td><td class="held"></td><td><button class="slds-button slds-button_neutral">Consolidate</button></td></tr></template>
+
+  <script>
+    // Demo datasets
+    const wallets=[{c:'Darcy Family',aum:12,wealth:30},{c:'Bingley LLC',aum:4,wealth:20},{c:'Knightley Trust',aum:7,wealth:10}];
+
+    // Wallet table
+    const wBody=document.getElementById('walletTable');
+    const wTmpl=document.getElementById('walletRow').content;
+    wallets.forEach(r=>{const row=wTmpl.cloneNode(true);row.querySelector('.client').textContent=r.c;row.querySelector('.aum').textContent='$'+r.aum+'M';row.querySelector('.wealth').textContent='$'+r.wealth+'M';const pct=(r.aum/r.wealth*100).toFixed(0)+'%';const walletSpan=row.querySelector('.wallet');walletSpan.textContent=pct;walletSpan.className='wallet slds-badge '+(r.aum/r.wealth<0.3?'badge-red':r.aum/r.wealth<0.6?'badge-yellow':'badge-green');row.querySelector('.held').textContent='$'+(r.wealth-r.aum)+'M';wBody.appendChild(row);});
+  </script>
+</body>
+</html>

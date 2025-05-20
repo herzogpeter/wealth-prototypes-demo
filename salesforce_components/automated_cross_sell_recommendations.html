@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Automated Cross-Sell Recommendations Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+
+  <!-- 2. Automated Cross‑Sell Recommendations -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-opportunity" title="Cross‑Sell">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#opportunity"></use></svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Automated Cross‑Sell Recommendations</h2>
+          <p class="slds-text-body_small">Surface next‑best products & services</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+        <thead><tr><th>Client</th><th>Gap Identified</th><th>Recommendation</th><th>Potential Revenue</th><th>Action</th></tr></thead>
+        <tbody id="crossTable"></tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- Templates -->
+  <template id="crossRow"><tr><td class="client"></td><td class="gap"></td><td class="rec"></td><td class="rev"></td><td><button class="slds-button slds-button_neutral">Create Task</button></td></tr></template>
+
+  <script>
+    // Demo datasets
+    const xSell=[{c:'Darcy Family',gap:'No Private Trust',rec:'Set up Family Trust',rev:25},{c:'Bingley LLC',gap:'No Insurance',rec:'High‑Net‑Worth Liability Policy',rev:5}];
+
+    // Cross‑sell table
+    const cBody=document.getElementById('crossTable');
+    const cTmpl=document.getElementById('crossRow').content;
+    xSell.forEach(r=>{const row=cTmpl.cloneNode(true);row.querySelector('.client').textContent=r.c;row.querySelector('.gap').textContent=r.gap;row.querySelector('.rec').textContent=r.rec;row.querySelector('.rev').textContent='$'+r.rev+'k';cBody.appendChild(row);});
+  </script>
+</body>
+</html>

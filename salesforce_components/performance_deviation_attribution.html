@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Performance Deviation & Attribution Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+  <!-- 2. Performance Deviation & Attribution -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><div class="slds-media slds-media_center"><div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-analytics"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#analytics"></use></svg></span></div><div class="slds-media__body"><h2 class="slds-card__header-title">Performance Deviation & Attribution</h2><p class="slds-text-body_small">Explain under/over‑performance</p></div></div></header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium"><table class="slds-table slds-table_bordered"><thead><tr><th>Client</th><th>Period</th><th>Vs Benchmark</th><th>Attribution Summary</th><th>Action</th></tr></thead><tbody id="perfTable"></tbody></table></div>
+  </article>
+
+  <!-- Templates -->
+  <template id="perfRow"><tr><td class="client"></td><td class="period"></td><td class="vs"></td><td class="attr"></td><td><button class="slds-button slds-button_neutral">View</button></td></tr></template>
+
+<script>
+  // Sample data
+  const perfDevs=[{c:'Bingley LLC',p:'Q1 25',vs:'‑3.2% vs ‑1%',attr:'Overweight small‑cap value; FX drag 0.5%'},{c:'Fitzwilliam Darcy',p:'Q1 25',vs:'+1% vs +3%',attr:'Energy underweight ‑1.5%'}];
+
+  function populate(id,tmpl,data,mapFn){const body=document.getElementById(id);const t=document.getElementById(tmpl).content;data.forEach(r=>{const row=t.cloneNode(true);mapFn(row,r);body.appendChild(row);});}
+
+  populate('perfTable','perfRow',perfDevs,(row,r)=>{row.querySelector('.client').textContent=r.c;row.querySelector('.period').textContent=r.p;row.querySelector('.vs').textContent=r.vs;row.querySelector('.attr').textContent=r.attr;});
+</script>
+</body>
+</html>

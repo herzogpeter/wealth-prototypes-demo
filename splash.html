@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wealth Management Use Cases - Powered by FactSet, Mercury & Salesforce FSC</title>
+    <link rel="stylesheet" href="slds-assets/styles/salesforce-lightning-design-system.min.css" />
+    <style>
+        body {
+            font-family: 'Salesforce Sans', Arial, sans-serif;
+            background-color: #f3f2f2;
+            color: #080707;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #0070d2; /* Salesforce Blue */
+            color: white;
+            border-radius: .25rem;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+        .page-header .intro-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        .category-card {
+            background-color: white;
+            border: 1px solid #dddbda;
+            border-radius: .25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,.1);
+        }
+        .category-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dddbda;
+            background-color: #f9f9f9;
+        }
+        .category-header h2 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: #005fb2; /* Darker Salesforce Blue */
+            margin: 0;
+        }
+        .category-body {
+            padding: 1.5rem;
+        }
+        .category-intro {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            color: #3e3e3c;
+        }
+        .prototype-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .prototype-list li {
+            margin-bottom: 0.75rem;
+        }
+        .prototype-list a {
+            text-decoration: none;
+            color: #0070d2;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+        }
+        .prototype-list a:hover {
+            color: #005fb2;
+            background-color: #f3f2f2;
+            border-color: #dddbda;
+        }
+        .slds-icon-text-default {
+            fill: currentColor;
+        }
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            color: #54698d;
+            border-top: 1px solid #dddbda;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="slds-scope">
+    <div class="container">
+        <header class="page-header">
+            <h1>Combining Client Data, FactSet Mercury, and Salesforce FSC</h1>
+            <p class="intro-text">Key Use Cases in Wealth Management. Financial advisors can unlock significant value by integrating their detailed client data (positions, transactions, performance) with the capabilities of FactSet’s Mercury API and Salesforce Financial Services Cloud (FSC). The following use cases illustrate how this combination can enhance client engagement, personalize advice, drive growth, improve efficiency, and mitigate risks, all in scalable ways with strong ROI potential.</p>
+        </header>
+
+        <!-- Client Engagement and Communication -->
+        <section class="category-card" id="client-engagement">
+            <div class="category-header">
+                <h2>Client Engagement and Communication</h2>
+            </div>
+            <div class="category-body">
+                <p class="category-intro">Advisors can use data-driven insights to engage clients in more timely, personalized, and proactive ways. By leveraging FactSet Mercury for real-time market intelligence and Salesforce FSC for workflow automation, firms keep clients informed and build trust through consistent, high-quality communication. In an era where clients expect on-demand information and a “cutting-edge digital experience,” these tools help advisors deliver just that.</p>
+                <ul class="prototype-list">
+                    <li><a href="index.html?prototype=proactive_updates">Proactive Personalized Updates</a></li>
+                    <li><a href="index.html?prototype=interactive_client_portal">Interactive Client Portals & Chatbots</a></li>
+                    <li><a href="index.html?prototype=automated_personalized_reports">Automated Personalized Reports</a></li>
+                    <li><a href="index.html?prototype=multi_channel_engagement_campaigns">Multi-Channel Engagement Campaigns</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Personalized Investment & Financial Planning -->
+        <section class="category-card" id="personalized-planning">
+            <div class="category-header">
+                <h2>Personalized Investment & Financial Planning</h2>
+            </div>
+            <div class="category-body">
+                <p class="category-intro">High-net-worth clients expect personalized, goals-based planning rather than one-size-fits-all portfolios. By combining internal data about client goals, preferences, and life events (stored in Salesforce) with FactSet’s analytics and Mercury’s AI, advisors can deliver hyper-personalized advice at scale. This not only improves client outcomes but also increases loyalty – clients feel understood when advice aligns closely with their life and objectives.</p>
+                <ul class="prototype-list">
+                    <li><a href="index.html?prototype=goal_tracking_adjustments">Goal Tracking & Real‑Time Adjustments</a></li>
+                    <li><a href="index.html?prototype=life_event_advice">Life Event–Driven Advice</a></li>
+                    <li><a href="index.html?prototype=customized_investment_recommendations">Customized Investment Recommendations</a></li>
+                    <li><a href="index.html?prototype=dynamic_financial_plans">Dynamic Financial Plans & What‑If Scenarios</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Business Development and Client Growth -->
+        <section class="category-card" id="business-development">
+            <div class="category-header">
+                <h2>Business Development and Client Growth</h2>
+            </div>
+            <div class="category-body">
+                <p class="category-intro">Data integration isn’t just about serving existing needs – it’s also a powerful engine for growth and revenue generation. By analyzing both internal and external data, advisors can uncover opportunities to deepen relationships or win new clients. Salesforce FSC provides tools for pipeline management and marketing, while FactSet Mercury can scan the broader financial landscape for signals that someone might need advice. Together, they enable targeted, efficient business development efforts (with high ROI by focusing on the most promising opportunities). Referral and Network Insights: High-net-worth clients are often part of valuable networks (family offices, business partnerships, community leadership). Salesforce FSC’s relationship mapping can be enriched with external data: for example, FactSet can provide information on a client’s affiliations. Advisors can use this to strategically identify referral opportunities. By systematically mining relationships and external events, what used to happen only by chance or intuition becomes a repeatable growth strategy.</p>
+                <ul class="prototype-list">
+                    <li><a href="index.html?prototype=wallet_share_analysis">Wallet Share & Held-Away Assets Analysis</a></li>
+                    <li><a href="index.html?prototype=automated_cross_sell_recommendations">Automated Cross‑Sell Recommendations</a></li>
+                    <li><a href="index.html?prototype=lead_generation_external_events">Lead Generation – External Events</a></li>
+                    <li><a href="index.html?prototype=segmentation_targeted_campaigns">Segmentation & Targeted Campaigns</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Internal Efficiency and Decision-Making -->
+        <section class="category-card" id="internal-efficiency">
+            <div class="category-header">
+                <h2>Internal Efficiency and Decision-Making</h2>
+            </div>
+            <div class="category-body">
+                <p class="category-intro">Combining portfolio data and CRM tools also yields powerful internal benefits. Advisors and executives can make faster, more informed decisions with all data at their fingertips, and many manual processes can be automated. This leads to significant efficiency gains. Reduced Operational Risk and Error: Efficiency isn’t just about speed – it’s also about reducing mistakes. By automating data flows between FactSet and Salesforce, the firm minimizes manual data entry and the errors that come with it. An integrated system provides an audit trail for decisions. AI can further assist by checking recommendations against client profiles and policies.</p>
+                <ul class="prototype-list">
+                    <li><a href="index.html?prototype=unified_client_view">360° Client Dashboard</a></li>
+                    <li><a href="index.html?prototype=workflow_automation_center">Workflow Automation & Tasks</a></li>
+                    <li><a href="index.html?prototype=ai_research_assistant">AI Research & Decision Support</a></li>
+                    <li><a href="index.html?prototype=management_analytics_dashboard">Analytics for Management Decisions</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Risk Management and Early Issue Identification -->
+        <section class="category-card" id="risk-management">
+            <div class="category-header">
+                <h2>Risk Management and Early Issue Identification</h2>
+            </div>
+            <div class="category-body">
+                <p class="category-intro">In wealth management, early detection of risks – whether market risks to client portfolios or operational risks to the firm – is essential to protect client wealth and maintain trust. By fusing portfolio data with real-time analytics from FactSet, and using Salesforce to monitor and alert, advisors can catch problems before they escalate. This proactive approach can save clients from losses and save the firm from crises, delivering a strong value proposition.</p>
+                <ul class="prototype-list">
+                    <li><a href="index.html?prototype=real_time_portfolio_risk_alerts">Real‑Time Portfolio Risk Alerts</a></li>
+                    <li><a href="index.html?prototype=performance_deviation_attribution">Performance Deviation & Attribution Analysis</a></li>
+                    <li><a href="index.html?prototype=automated_compliance_monitoring">Automated Compliance and Regulatory Monitoring</a></li>
+                    <li><a href="index.html?prototype=scenario_analysis_stress_testing">Scenario Analysis & Stress Testing</a></li>
+                    <li><a href="index.html?prototype=portfolio_drift_quality_control">Portfolio Drift and Quality Control</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2025 Prototype Showcase. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

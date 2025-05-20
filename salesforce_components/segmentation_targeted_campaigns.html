@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Segmentation & Targeted Campaigns Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+
+  <!-- 4. Segmentation & Targeted Campaigns -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-goal" title="Segmentation">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#goal"></use></svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Segmentation & Targeted Campaigns</h2>
+          <p class="slds-text-body_small">Data‑driven marketing with ROI tracking</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="segSelect">Segment</label>
+            <div class="slds-form-element__control"><div class="slds-select_container"><select class="slds-select" id="segSelect"><option value="tech">Tech Professionals</option><option value="retirees">Pre‑Retirees</option><option value="entrepreneurs">Entrepreneurs</option></select></div></div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
+          <button class="slds-button slds-button_brand" onclick="launchCampaign()">Launch Campaign</button>
+        </div>
+      </div>
+      <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+        <thead><tr><th>Segment</th><th>Size</th><th>Open Rate</th><th>CTR</th><th>Next Step</th></tr></thead>
+        <tbody id="segTable"></tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- Templates -->
+  <template id="segRow"><tr><td class="seg"></td><td class="size"></td><td class="open"></td><td class="ctr"></td><td><button class="slds-button slds-button_neutral">View Leads</button></td></tr></template>
+
+  <script>
+    // Demo datasets
+    const segs=[{seg:'Tech Professionals',size:150,open:42,ctr:8},{seg:'Entrepreneurs',size:80,open:38,ctr:6}];
+
+    // Segmentation table
+    const sBody=document.getElementById('segTable');
+    const sTmpl=document.getElementById('segRow').content;
+    segs.forEach(r=>{const row=sTmpl.cloneNode(true);row.querySelector('.seg').textContent=r.seg;row.querySelector('.size').textContent=r.size;row.querySelector('.open').textContent=r.open+'%';row.querySelector('.ctr').textContent=r.ctr+'%';sBody.appendChild(row);});
+
+    function launchCampaign(){alert('Campaign launched for '+document.getElementById('segSelect').value);}
+  </script>
+</body>
+</html>

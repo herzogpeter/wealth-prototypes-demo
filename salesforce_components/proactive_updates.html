@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Proactive Personalized Updates</title>
+  <!-- Salesforce Lightning Design System -->
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css">
+  <style>
+    body { padding:1rem; background:#f3f2f2; }
+    .alert-impact-pos { color: green; }
+    .alert-impact-neg { color: #c23934; }
+  </style>
+</head>
+<body>
+  <div class="slds-scope">
+    <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-notification" title="Alerts">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#notification"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate" title="Proactive Personalized Updates">
+            Proactive Personalized Updates
+          </h2>
+          <p class="slds-text-body_small">Real-time portfolio & market alerts powered by FactSet Mercury</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body">
+      <ul class="slds-has-dividers_around-space" id="alertList">
+        <!-- Alerts will be populated here -->
+      </ul>
+    </div>
+    </article>
+  </div>
+
+  <!-- Template for each alert row -->
+  <template id="alertRow">
+    <li class="slds-item slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-grid_align-spread">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-6">
+          <p class="slds-text-title_caps slds-truncate alert-title"></p>
+          <p class="alert-message"></p>
+          <p class="slds-text-body_small alert-date"></p>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-6 slds-text-align_right">
+          <p class="slds-text-body_regular alert-impact"></p>
+          <div class="slds-button-group" role="group">
+            <button class="slds-button slds-button_neutral btn-action" data-action="notify">Notify Client</button>
+            <button class="slds-button slds-button_neutral btn-action" data-action="dismiss">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </li>
+  </template>
+
+  <script>
+    // Sample alert data – replace with data retrieved via Apex/Flow & FactSet Mercury
+    const alerts = [
+      {
+        id: 1,
+        title: 'Stock Drop Alert',
+        message: 'AAPL fell 5.3% today. Tech stocks are broadly lower, but your diversified holdings cushioned the impact.',
+        date: 'May 19, 2025 11:20 AM',
+        impact: '-$14,250',
+        impactType: 'neg'
+      },
+      {
+        id: 2,
+        title: 'New Portfolio High',
+        message: 'Congratulations! Your portfolio reached a new 12-month high today, driven by gains in healthcare holdings.',
+        date: 'May 19, 2025 9:05 AM',
+        impact: '+$8,870',
+        impactType: 'pos'
+      }
+    ];
+
+    const list = document.getElementById('alertList');
+    const rowTmpl = document.getElementById('alertRow').content;
+
+    function renderAlerts() {
+      list.innerHTML = '';
+      alerts.forEach(alert => {
+        const row = rowTmpl.cloneNode(true);
+        row.querySelector('.alert-title').textContent = alert.title;
+        row.querySelector('.alert-message').textContent = alert.message;
+        row.querySelector('.alert-date').textContent = alert.date;
+        const impactEl = row.querySelector('.alert-impact');
+        impactEl.textContent = alert.impact;
+        impactEl.classList.add(alert.impactType === 'pos' ? 'alert-impact-pos' : 'alert-impact-neg');
+        row.querySelectorAll('.btn-action').forEach(btn => {
+          btn.addEventListener('click', e => handleAction(alert.id, e.target.dataset.action));
+        });
+        list.appendChild(row);
+      });
+    }
+
+    function handleAction(id, action) {
+      if (action === 'notify') {
+        // Replace console.log with Apex/Flow invocation to send client communication
+        console.log(`Notify client for alert ${id}`);
+      }
+      if (action === 'dismiss') {
+        // Replace console.log with Apex/Flow invocation to mark alert handled
+        console.log(`Dismiss alert ${id}`);
+      }
+    }
+
+    renderAlerts();
+  </script>
+</body>
+</html>

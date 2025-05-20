@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Automated Personalized Reports</title>
+  <!-- SLDS stylesheet for preview outside Salesforce -->
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body { padding: 1rem; background: #f3f2f2; }
+    .status-draft { background: #FFB75D; }
+    .status-reviewed { background: #6EC664; }
+    .status-sent { background: #00A1E0; }
+    .slds-modal__container {
+      max-width: 60rem;
+      width: 90%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Card -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-report" title="Reports">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#report"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate" title="Automated Personalized Reports">Automated Personalized Reports</h2>
+          <p class="slds-text-body_small">Quarterly AI‑generated portfolio commentary & performance reports</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-vertical_x-small">
+      <div class="slds-grid slds-wrap slds-grid_align-spread slds-gutters_small">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="filter-quarter">Quarter</label>
+            <div class="slds-form-element__control">
+              <div class="slds-select_container">
+                <select class="slds-select" id="filter-quarter">
+                  <option value="Q1-2025">Q1&nbsp;2025</option>
+                  <option value="Q4-2024">Q4&nbsp;2024</option>
+                  <option value="Q3-2024">Q3&nbsp;2024</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="filter-status">Status</label>
+            <div class="slds-form-element__control">
+              <div class="slds-select_container">
+                <select class="slds-select" id="filter-status">
+                  <option value="all">All</option>
+                  <option value="draft">Draft</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="sent">Sent</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
+          <button class="slds-button slds-button_brand" id="btn-new">Generate Reports</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-scrollable_y" style="max-height:400px;">
+        <table class="slds-table slds-table_fixed-layout slds-table_bordered slds-table_col-bordered" role="grid" id="reportsTable">
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col"><div class="slds-truncate" title="Client">Client</div></th>
+              <th scope="col"><div class="slds-truncate" title="Period">Period</div></th>
+              <th scope="col"><div class="slds-truncate" title="Status">Status</div></th>
+              <th scope="col"><div class="slds-truncate" title="Performance vs Goal">Perf&nbsp;vs&nbsp;Goal</div></th>
+              <th scope="col"><div class="slds-truncate" title="Actions">Actions</div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- rows populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </article>
+
+  <!-- Modal / Preview -->
+  <section role="dialog" tabindex="-1" class="slds-modal" id="previewModal" aria-labelledby="modal-heading" aria-modal="true" style="display:none;">
+    <div class="slds-modal__container">
+      <header class="slds-modal__header">
+        <h2 class="slds-text-heading_medium" id="modal-heading">Report Preview</h2>
+        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close dialog" onclick="closeModal()">
+          <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+            <use xlink:href="../slds-assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+          </svg>
+        </button>
+      </header>
+      <div class="slds-modal__content slds-p-around_medium" id="modal-content">
+        <!-- dynamic preview -->
+      </div>
+      <footer class="slds-modal__footer">
+        <button class="slds-button slds-button_neutral" onclick="closeModal()">Close</button>
+        <button class="slds-button slds-button_brand" id="btn-send" onclick="sendReport()">Send to Client</button>
+      </footer>
+    </div>
+  </section>
+  <div class="slds-backdrop" id="backdrop" style="display:none;"></div>
+
+  <template id="rowTemplate">
+    <tr>
+      <td><div class="slds-truncate clientName" title=""></div></td>
+      <td><div class="slds-truncate period" title=""></div></td>
+      <td><span class="slds-badge status"></span></td>
+      <td><div class="slds-truncate perf" title=""></div></td>
+      <td>
+        <button class="slds-button slds-button_neutral btn-preview">Preview</button>
+        <button class="slds-button slds-button_neutral btn-edit">Edit</button>
+      </td>
+    </tr>
+  </template>
+
+  <script>
+    // Placeholder data. Replace this with Apex @wire calls.
+    const reports = [
+      { id:1, client:'Elizabeth Bennett', period:'Q1&nbsp;2025', status:'draft', perf:'+2.1% vs +1.5%', narrative:'Your portfolio exceeded the growth goal for Q1 2025, primarily driven by strong performance in healthcare and energy positions. Allocation drift remains minimal.' },
+      { id:2, client:'Charles Bingley', period:'Q1&nbsp;2025', status:'reviewed', perf:'-0.3% vs +1.0%', narrative:'Market volatility led to a slight shortfall. Tech overweight accounted for much of the underperformance; diversification strategies recommended.' },
+      { id:3, client:'Fitzwilliam Darcy', period:'Q4&nbsp;2024', status:'sent', perf:'+4.8% vs +4.0%', narrative:'Robust gains in international equities drove outperformance. ESG holdings also contributed positively, aligning with stated values and objectives.' }
+    ];
+
+    const statusClasses = { draft:'status-draft', reviewed:'status-reviewed', sent:'status-sent' };
+
+    const tableBody = document.querySelector('#reportsTable tbody');
+    const tmpl = document.getElementById('rowTemplate').content;
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      reports.forEach(r => {
+        const row = tmpl.cloneNode(true);
+        row.querySelector('.clientName').textContent = r.client;
+        row.querySelector('.period').textContent = r.period;
+        const statusEl = row.querySelector('.status');
+        statusEl.textContent = r.status.charAt(0).toUpperCase()+r.status.slice(1);
+        statusEl.classList.add(statusClasses[r.status]);
+        row.querySelector('.perf').textContent = r.perf;
+        row.querySelector('.btn-preview').addEventListener('click', () => openModal(r));
+        row.querySelector('.btn-edit').addEventListener('click', () => editReport(r.id));
+        tableBody.appendChild(row);
+      });
+    }
+
+    function openModal(report) {
+      document.getElementById('modal-content').innerHTML = `
+        <h3 class="slds-text-heading_small">\${report.client} — \${report.period}</h3>
+        <p class="slds-text-body_regular slds-m-top_medium"><strong>Performance vs Goal:</strong> \${report.perf}</p>
+        <p class="slds-m-top_medium">\${report.narrative}</p>
+      `;
+      document.getElementById('btn-send').onclick = () => sendReport(report.id);
+      document.getElementById('previewModal').style.display='block';
+      document.getElementById('backdrop').style.display='block';
+    }
+
+    function closeModal() {
+      document.getElementById('previewModal').style.display='none';
+      document.getElementById('backdrop').style.display='none';
+    }
+
+    function sendReport(id) {
+      console.log('Send report', id); // replace with Apex action
+      closeModal();
+      // update UI to mark sent
+      const rpt = reports.find(r=>r.id===id);
+      if (rpt) {
+        rpt.status='sent';
+        renderTable();
+      }
+    }
+
+    function editReport(id) {
+      // navigate to record page or open builder
+      console.log('Edit report', id);
+    }
+
+    // initial render
+    renderTable();
+  </script>
+</body>
+</html>

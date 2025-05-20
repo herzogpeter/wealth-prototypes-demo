@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scenario Analysis & Stress Testing Prototype</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+  <!-- 4. Scenario Analysis & Stress Testing -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><div class="slds-media slds-media_center"><div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-scan_card"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#scan_card"></use></svg></span></div><div class="slds-media__body"><h2 class="slds-card__header-title">Scenario Analysis & Stress Testing</h2><p class="slds-text-body_small">Model extreme events & impacts</p></div></div></header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12"><div class="slds-form-element"><label class="slds-form-element__label" for="scenarioSelect">Scenario</label><div class="slds-form-element__control"><div class="slds-select_container"><select class="slds-select" id="scenarioSelect"><option value="crisis">2008‑Like Crisis</option><option value="rate">Rate Spike +300bps</option><option value="pandemic">Pandemic 2.0</option></select></div></div></div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom"><button class="slds-button slds-button_brand" onclick="runStress()">Run</button></div>
+      </div>
+      <div id="stressResult" class="slds-box slds-box_x-small slds-text-longform">Select a scenario to view results…</div>
+    </div>
+  </article>
+
+<script>
+  function runStress(){const sel=document.getElementById('scenarioSelect').value;const res=document.getElementById('stressResult');let txt='';if(sel==='crisis')txt='Projected drawdown: ‑25% | 15 clients over 20% loss.';if(sel==='rate')txt='Bond values ‑10%; recommend duration hedge for 8 accounts.';if(sel==='pandemic')txt='Global equities ‑18%; cash reserves sufficient for 6m income.';res.textContent=txt;}
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dynamic Plans & What‑If Scenarios</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+
+  <!-- 4. Dynamic Financial Plans & "What‑If" Scenarios -->
+  <article class="slds-card" id="scenarioCard">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-form" title="Scenarios">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#form"></use>
+            </svg>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h2 class="slds-card__header-title slds-truncate">Dynamic Plans & What‑If Scenarios</h2>
+          <p class="slds-text-body_small">Model market & life changes interactively</p>
+        </div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="scenarioSelect">Select Scenario</label>
+            <div class="slds-form-element__control">
+              <div class="slds-select_container">
+                <select class="slds-select" id="scenarioSelect">
+                  <option value="marketDrop">20% Market Drop Next Year</option>
+                  <option value="vacationHome">Purchase $2M Vacation Home in 5 Years</option>
+                  <option value="rateSpike">Interest Rates +200 bps</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
+          <button class="slds-button slds-button_brand" onclick="runScenario()">Run</button>
+        </div>
+      </div>
+      <div id="scenarioResult" class="slds-box slds-box_x-small slds-is-relative" style="min-height:120px;">
+        <p class="slds-text-body_regular">Select a scenario and click Run to view impact...</p>
+      </div>
+    </div>
+  </article>
+
+  <script>
+    // Scenarios
+    function runScenario(){
+      const scenarioSelect = document.getElementById('scenarioSelect');
+      const scenarioResult = document.getElementById('scenarioResult');
+      if (!scenarioSelect || !scenarioResult) return;
+
+      const val = scenarioSelect.value;
+      let text = '';
+      if(val==='marketDrop') text='Projected portfolio value may fall 12% peak-to-trough; Retirement goal shortfall increases by $250k. Consider shifting 5% to bonds.';
+      if(val==='vacationHome') text='Adding $2M purchase reduces liquidity ratio to low. Recommend financing 50% with mortgage and adjusting cash reserves.';
+      if(val==='rateSpike') text='Bond values may drop 7%. Income portfolio yield rises to 5%. Suggest laddered bond strategy to mitigate duration risk.';
+      scenarioResult.innerHTML=`<p class='slds-text-body_regular'>\${text}</p>`;
+    }
+  </script>
+</body>
+</html>
