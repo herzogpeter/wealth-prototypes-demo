@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agentforce Automated Task Execution</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .badge-green{background:#6ec664;color:#fff;}
+    .badge-blue{background:#1589ee;color:#fff;}
+    .badge-red{background:#ea001e;color:#fff;}
+    .log{height:240px;overflow-y:auto;border:1px solid #d8dde6;border-radius:.25rem;background:#fff;padding:.5rem;}
+  </style>
+</head>
+<body>
+  <!-- Agent Overview -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-process"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#process"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">Agentforce Automation Center</h2><p class="slds-text-body_small">Agents executing Salesforce Flows & Apex in real time</p></div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <div class="slds-text-title_caps">Active Agents</div>
+          <ul class="slds-list_dotted slds-m-top_x-small">
+            <li><span class="badge-blue slds-badge">Meeting Note Draft</span> – Auto‑summarize client calls</li>
+            <li><span class="badge-blue slds-badge">Goal Updater</span> – Edit Goal records & trigger plan recalc</li>
+            <li><span class="badge-blue slds-badge">Market Dip Response</span> – Outreach on >3% market drop</li>
+          </ul>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+          <div class="slds-text-title_caps">Latest Agent Activity</div>
+          <div class="log" id="activityLog"></div>
+          <div class="slds-m-top_small"><button class="slds-button slds-button_brand" onclick="simulate()">Simulate New Event</button></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Manual Trigger Cards -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Run Agent Tasks Manually</h2></header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <article class="slds-box slds-box_x-small">
+            <h3 class="slds-text-heading_small">Draft Meeting Notes</h3>
+            <p class="slds-m-vertical_x-small">Use transcript ID to auto‑generate summary & tasks.</p>
+            <input type="text" class="slds-input" placeholder="Transcript ID" id="transcriptId" />
+            <button class="slds-button slds-button_neutral slds-m-top_small" onclick="draftNotes()">Run Agent</button>
+          </article>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <article class="slds-box slds-box_x-small">
+            <h3 class="slds-text-heading_small">Update Goal & Recalc Plan</h3>
+            <p class="slds-m-vertical_x-small">Adjust target age / amount, trigger MoneyGuide recalc.</p>
+            <input type="number" class="slds-input" id="age" placeholder="New Retirement Age" />
+            <button class="slds-button slds-button_neutral slds-m-top_small" onclick="updateGoal()">Run Agent</button>
+          </article>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+          <article class="slds-box slds-box_x-small">
+            <h3 class="slds-text-heading_small">Market Dip Response</h3>
+            <p class="slds-m-vertical_x-small">Simulate S&P 500 ‑4% day to trigger outreach workflow.</p>
+            <button class="slds-button slds-button_neutral" onclick="dipResponse()">Trigger Dip Scenario</button>
+          </article>
+        </div>
+      </div>
+    </div>
+  </article>
+
+<script>
+  const log=document.getElementById('activityLog');
+  function entry(txt,cls){const p=document.createElement('p');p.innerHTML=txt;cls&&p.classList.add(cls);log.prepend(p);} // newest top
+
+  function simulate(){entry('⏱️ <em>No new alerts in last scan</em>');}
+
+  function draftNotes(){const id=document.getElementById('transcriptId').value.trim();if(!id)return alert('Enter transcript ID');entry(`📝 Meeting Note Draft Agent <span class="badge-green slds-badge">SUCCESS</span> – Summary & 3 tasks created for transcript <strong>${id}</strong>.`);} 
+
+  function updateGoal(){const age=document.getElementById('age').value; if(!age)return alert('Enter age'); entry(`🎯 Goal Updater <span class="badge-green slds-badge">SUCCESS</span> – Retirement age updated to <strong>${age}</strong>; MoneyGuidePro recalculation enqueued.`);} 
+
+  function dipResponse(){entry('📉 Market Dip Response <span class="badge-red slds-badge">RUNNING</span> – Scanning affected clients...');setTimeout(()=>{entry('📧 Personalized emails drafted for 8 clients near retirement. Call scripts attached. <span class="badge-green slds-badge">COMPLETE</span>');},1000);} 
+</script>
+</body>
+</html>

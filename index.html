@@ -275,6 +275,12 @@
                 name: 'Financial Plan Copilot',
                 path: 'salesforce_components/financial_plan_copilot.html',
                 description: 'Advisor’s Intelligent Assistant: Build an agent (perhaps called “Financial Plan Copilot”) that integrates with Salesforce data and MoneyGuide outputs. Using Prompt Builder, you can ground the agent in the client’s financial data from CRM (accounts, goals, plan summaries) to ensure accurate responses. This agent could answer advisors’ natural language questions like, “Summarize John Doe’s financial plan and highlight any concerns”. The Atlas Reasoning Engine can break down such a request: retrieve John’s goals and plan metrics, compare current vs target values, and generate a narrative answer. For example, the agent might respond: “John has a 78% probability of retirement success at age 65, slightly below the 85% target ￼. The shortfall is mainly due to recent market declines reducing his 401(k) balance. I suggest discussing either postponing retirement to 66 or increasing his annual savings by $5,000. Additionally, his college funding goal is on track at 90% funded.” This kind of instant analysis saves the advisor time combing through reports. It’s feasible because Agentforce can use real-time data adaptation and actions across Salesforce records ￼, and even call external APIs if needed (e.g., to run a quick projection).'
+            },
+            {
+                id: 'agentforce_automated_tasks',
+                name: 'Agentforce Automated Task Execution',
+                path: 'salesforce_components/agentforce_automated_tasks.html',
+                description: 'Automated Task Execution: Agentforce agents can not only chat, but actually perform tasks via Salesforce Flow and Apex actions ￼ ￼. Take advantage of this for routine but time-consuming processes. For example, after a client meeting, an agent could automatically draft meeting notes and update the plan objects: it might read the conversation transcript (if available), identify discussed changes (e.g., “client wants to retire at 64 instead of 62”), update the Goal record in Salesforce, and even enqueue a recalculation in MoneyGuidePro (if an integration allows). Similarly, an agent could monitor data and “autonomously execute” a sequence of steps when triggers occur ￼. Imagine a “Market Dip Response” agent: if markets fall by a certain percentage, the agent kicks off, identifies all affected clients (Data Cloud query), prioritizes those near retirement, and generates a personalized email for each outlining the impact and reassurance. It could even draft talking points or call scripts for advisors to use. This level of automation and intelligent planning was previously not possible, but with Agentforce’s Atlas Reasoning breaking down complex tasks and Salesforce’s integration of data, it’s within reach. AI agents effectively serve as junior analysts for the advisory team, crunching numbers and scouting issues so that human advisors can focus on high-touch conversations.'
             }
         ];
 
@@ -332,7 +338,8 @@
                     'transactional_behavioral_insights',
                     'factset_mercury_assistant',
                     'real_time_alerts_modeling',
-                    'financial_plan_copilot'
+                    'financial_plan_copilot',
+                    'agentforce_automated_tasks'
                 ]
             }
         ];
