@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Portfolio – Advisor Dashboard</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body { padding: 1rem; background: #f3f2f2; }
+    .slds-card { margin-bottom: 1.5rem; }
+    .metric { font-size: 1.75rem; font-weight: 700; }
+    .sub { font-size: .75rem; color: #444; }
+    .up { color:#28a745; }
+    .down { color:#c23934; }
+    .alloc-bar { height:6px; border-radius:3px; background:#d8dde6; position:relative; }
+    .alloc-fill { height:6px; border-radius:3px; background:#1589ee; position:absolute; top:0; left:0; }
+    .alert-red{background:#ea001e;color:#fff;}
+    .alert-yellow{background:#ffb75d;color:#000;}
+    .alert-green{background:#04844b;color:#fff;} /* Added for consistency */
+  </style>
+</head>
+<body>
+  <!-- Top KPI Card -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium">
+      <div class="slds-media slds-media_center">
+        <div class="slds-media__figure"><span class="slds-icon_container slds-icon-standard-investment"><svg class="slds-icon slds-icon_small"><use xlink:href="../slds-assets/icons/standard-sprite/svg/symbols.svg#investment"></use></svg></span></div>
+        <div class="slds-media__body"><h2 class="slds-card__header-title">Portfolio Overview (Real‑Time)</h2><p class="slds-text-body_small">Updated <span id="updTime"></span></p></div>
+      </div>
+    </header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"><div class="metric" id="mktVal"></div><div class="sub">Market Value</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"><div class="metric" id="dayChg"></div><div class="sub">Today</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"><div class="metric" id="ytd"></div><div class="sub">YTD</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12"><img src="https://dummyimage.com/500x120/f3f2f2/808080&text=Intraday+Performance+Chart" alt="Intraday Performance Chart" style="width:100%; border: 1px solid #dddbda;"></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Holdings Table -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Current Holdings</h2></header>
+    <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+      <div class="slds-scrollable_y" style="max-height:260px;">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout" role="grid">
+          <thead><tr><th>Ticker</th><th>Qty</th><th>Market Value</th><th>Day Chg%</th><th>Allocation</th></tr></thead>
+          <tbody id="holdingsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </article>
+
+  <!-- Recent Transactions & Alerts Row -->
+  <div class="slds-grid slds-wrap slds-gutters_medium">
+    <!-- Transactions -->
+    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+      <article class="slds-card">
+        <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Recent Transactions</h2></header>
+        <div class="slds-card__body slds-p-horizontal_medium slds-p-bottom_medium">
+          <table class="slds-table slds-table_bordered" role="grid">
+            <thead><tr><th>Date</th><th>Type</th><th>Ticker</th><th>Qty</th><th>Amount</th></tr></thead>
+            <tbody id="txnBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+    <!-- Goal Funding Alerts -->
+    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+      <article class="slds-card">
+        <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Goal Funding Alerts</h2></header>
+        <div class="slds-card__body slds-p-around_medium" id="alertList"></div>
+      </article>
+    </div>
+  </div>
+
+  <template id="holdingRow">
+    <tr>
+      <td class="tic"></td>
+      <td class="qty"></td>
+      <td class="val"></td>
+      <td class="chg"></td>
+      <td><div class="alloc-bar"><div class="alloc-fill"></div></div></td>
+    </tr>
+  </template>
+
+  <template id="txnRow"><tr><td class="date"></td><td class="type"></td><td class="tic"></td><td class="qty"></td><td class="amt"></td></tr></template>
+  <template id="alertBox"><div class="slds-box slds-box_x-small slds-m-bottom_x-small"><strong class="goal"></strong><p class="msg"></p></div></template>
+
+  <script>
+    // Fake real‑time data (would stream via Data Cloud in prod)
+    const holdings=[{t:'AAPL',q:250,v:43000,c:-1.2,alloc:18.2},{t:'MSFT',q:150,v:52000,c:0.5,alloc:22.0},{t:'VOO',q:300,v:75000,c:0.2,alloc:31.8},{t:'AGG',q:400,v:33000,c:0.1,alloc:14.0},{t:'CASH',q:null,v:23000,c:0,alloc:9.7}]; // Adjusted alloc slightly for sum
+    const txns=[{d:'05/20/25',ty:'BUY',t:'VOO',q:50,a:'$12,450'},{d:'05/19/25',ty:'DIV',t:'MSFT',q:null,a:'$310'},{d:'05/18/25',ty:'SELL',t:'AAPL',q:30,a:'$5,250'}];
+    const alerts=[{g:'Retirement Goal',msg:'Funding slipped to 78% (-10% vs last review). Consider increasing contributions.',sev:'alert-yellow'},{g:'College Fund (Emily)',msg:'On track at 102% funding.',sev:'alert-green'}];
+
+    document.getElementById('updTime').textContent=new Date().toLocaleTimeString();
+    const totVal=holdings.reduce((s,h)=>s+h.v,0);
+    document.getElementById('mktVal').textContent='$'+totVal.toLocaleString();
+    const dayChgVal = holdings.reduce((s,h)=>s+(h.v*h.c/100),0);
+    const dayChgPct = (dayChgVal / totVal) * 100;
+    const dayChgEl = document.getElementById('dayChg');
+    dayChgEl.textContent=(dayChgPct>=0?'+':'')+dayChgPct.toFixed(2)+'%';
+    dayChgEl.className='metric '+(dayChgPct>=0?'up':'down');
+    document.getElementById('ytd').textContent='+5.4%'; // Static YTD for demo
+
+    // holdings
+    const hBody=document.getElementById('holdingsBody');
+    const hT=document.getElementById('holdingRow').content;
+    if (hBody && hT) {
+        holdings.forEach(h=>{
+            const r=hT.cloneNode(true);
+            r.querySelector('.tic').textContent=h.t;
+            r.querySelector('.qty').textContent=h.q||'—';
+            r.querySelector('.val').textContent='$'+h.v.toLocaleString();
+            const ch=r.querySelector('.chg');
+            ch.textContent=(h.c>=0?'+':'')+h.c.toFixed(1)+'%'; // Ensure one decimal for consistency
+            ch.className=h.c>=0?'up':'down';
+            const f=r.querySelector('.alloc-fill');
+            f.style.width=h.alloc+'%';
+            hBody.appendChild(r);
+        });
+    }
+
+    // txns
+    const tBody=document.getElementById('txnBody');
+    const tT=document.getElementById('txnRow').content;
+    if (tBody && tT) {
+        txns.forEach(x=>{
+            const r=tT.cloneNode(true);
+            r.querySelector('.date').textContent=x.d;
+            r.querySelector('.type').textContent=x.ty;
+            r.querySelector('.tic').textContent=x.t || '—';
+            r.querySelector('.qty').textContent=x.q||'—';
+            r.querySelector('.amt').textContent=x.a;
+            tBody.appendChild(r);
+        });
+    }
+
+    // alerts
+    const aDiv=document.getElementById('alertList');
+    const aT=document.getElementById('alertBox').content;
+    if (aDiv && aT) {
+        alerts.forEach(a=>{
+            const b=aT.cloneNode(true);
+            const boxDiv = b.querySelector('.slds-box'); // Get the div to add class to
+            boxDiv.querySelector('.goal').textContent=a.g;
+            boxDiv.querySelector('.msg').textContent=a.msg;
+            if(a.sev) boxDiv.classList.add(a.sev); // Add severity class to the box itself
+            aDiv.appendChild(b);
+        });
+    }
+  </script>
+</body>
+</html>
