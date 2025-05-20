@@ -251,6 +251,12 @@
                 name: 'Live Portfolio – Advisor Dashboard',
                 path: 'salesforce_components/live_portfolio_dashboard.html',
                 description: 'Live Portfolio Positions & Performance: Salesforce can ingest up-to-the-minute data on investment positions, transactions, and portfolio performance (e.g. via Data Cloud or an AppExchange package) and display these in the advisor’s dashboard. This means advisors and clients see current account values and can act on changes immediately. MoneyGuidePro generally relies on periodic data aggregation (e.g. nightly feeds or Yodlee sync) rather than truly real-time updates. With Salesforce, any significant portfolio change can trigger proactive actions. For instance, if a client’s account balance falls due to a market drop, Salesforce can flag impacted goals instantly. FSC’s Spring ’24 update introduced a feature to “view the financial account funding a goal” and adjust goal allocations when account balances change. This is something MGP alone wouldn’t handle in real-time. In Salesforce, the moment a balance update comes in, an advisor might see a notification that Goal X’s funding is now 10% behind schedule due to the drop, prompting timely client outreach. In short, real-time data enables continuous plan monitoring – a capability beyond MGP’s static plans.'
+            },
+            {
+                id: 'transactional_behavioral_insights',
+                name: 'Transactional & Behavioral Insights',
+                path: 'salesforce_components/transactional_behavioral_insights.html',
+                description: 'Transactional & Behavioral Insights: Salesforce Data Cloud can unify not just investment data but also client behavioral and spending data from banking transactions. This allows analysis of cash flows and habits: e.g. “month-by-month breakdown of income and expenses” and categorized spending trends. MGP\\\'s focus is long-term planning; it doesn\\\'t track daily spending or provide personal finance management insights. By leveraging these real-time transactional insights, advisors can identify when a client\\\'s actual spending deviates from the plan\\\'s assumptions. For example, if MGP\\\'s plan assumed $5,000 monthly spending but Data Cloud shows the client recently spending $7,000/month, Salesforce can alert the advisor to revisit the plan. These client cash-flow insights go beyond MoneyGuidePro by grounding the plan in day-to-day reality. Advisors can then have more data-driven conversations (e.g. “You spent more on travel than planned last quarter; let\\\'s adjust your goal or budget”).'
             }
         ];
 
@@ -304,7 +310,8 @@
             {
                 name: "Extending Beyond MGP with Real-Time Data (Salesforce + Mercury)",
                 prototypeIds: [
-                    'live_portfolio_dashboard'
+                    'live_portfolio_dashboard',
+                    'transactional_behavioral_insights'
                 ]
             }
         ];

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transactional & Behavioral Insights</title>
+  <link rel="stylesheet" href="../slds-assets/styles/salesforce-lightning-design-system.min.css" />
+  <style>
+    body{padding:1rem;background:#f3f2f2;}
+    .slds-card{margin-bottom:1.5rem;}
+    .metric{font-size:1.5rem;font-weight:700;}
+    .up{color:#28a745;}
+    .down{color:#c23934;}
+    .cat-color{width:12px;height:12px;display:inline-block;border-radius:2px;margin-right:4px;}
+    .legend-item{display:flex;align-items:center;margin-bottom:4px;}
+    .alert-red{background:#ea001e;color:#fff;}
+    .alert-yellow{background:#ffb75d;color:#000;}
+  </style>
+</head>
+<body>
+  <!-- Cash Flow Summary -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Cash Flow Summary – Last 12 Months</h2></header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="income"></div><div>Avg Monthly Income</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="expense"></div><div>Avg Monthly Expenses</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="net"></div><div>Net Cash Flow</div></div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12"><div class="metric" id="variance"></div><div>Plan vs Actual Spend</div></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Income & Expense Trend Chart -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Monthly Income vs. Expenses</h2></header>
+    <div class="slds-card__body slds-p-around_medium">
+      <img src="https://dummyimage.com/800x200/ffffff/808080&text=Line+Chart+Placeholder" alt="chart" style="width:100%">
+    </div>
+  </article>
+
+  <!-- Expense Categories Breakdown -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Spending by Category – Last Quarter</h2></header>
+    <div class="slds-card__body slds-p-around_medium">
+      <div class="slds-grid slds-wrap slds-gutters_medium">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+          <img src="https://dummyimage.com/300x300/ffffff/808080&text=Donut+Chart" alt="donut" style="width:100%">
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12" id="legend"></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Alerts for Plan Deviations -->
+  <article class="slds-card">
+    <header class="slds-card__header slds-p-around_medium"><h2 class="slds-card__header-title">Spending Deviations Alerts</h2></header>
+    <div class="slds-card__body slds-p-around_medium" id="alertList"></div>
+  </article>
+
+<script>
+  // Demo data
+  const planSpend = 5000;
+  const avgIncome = 11200;
+  const avgExp = 6200;
+  const catData = [
+    {c:'Housing',v:2400,col:'#5c6ac4'},
+    {c:'Travel',v:1600,col:'#ff6f61'},
+    {c:'Dining',v:900,col:'#f2b01e'},
+    {c:'Health',v:500,col:'#6ec664'},
+    {c:'Other',v:800,col:'#1589ee'}
+  ];
+  const alerts = [
+    `Client spent $7,000 on average vs plan $5,000 (+40%). Travel category up 60% QoQ.`,
+    `Dining spend exceeded budget by $350 last month.`
+  ];
+
+  // Summary metrics
+  document.getElementById('income').textContent = '$' + avgIncome.toLocaleString();
+  document.getElementById('expense').textContent = '$' + avgExp.toLocaleString();
+  const net = avgIncome - avgExp;
+  document.getElementById('net').textContent = (net >= 0 ? '+' : '-') + '$' + Math.abs(net).toLocaleString();
+  document.getElementById('net').className = 'metric ' + (net >= 0 ? 'up' : 'down');
+  const varPct = ((avgExp - planSpend) / planSpend * 100).toFixed(1);
+  document.getElementById('variance').textContent = (varPct >= 0 ? '+' : '') + varPct + '%';
+  document.getElementById('variance').className = 'metric ' + (varPct <= 0 ? 'up' : 'down');
+
+  // Legend
+  const legend = document.getElementById('legend');
+  catData.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'legend-item';
+    div.innerHTML = `<span class="cat-color" style="background:${d.col}"></span>${d.c}: $${d.v.toLocaleString()}`;
+    legend.appendChild(div);
+  });
+
+  // Alerts
+  const aList = document.getElementById('alertList');
+  alerts.forEach(t => {
+    const box = document.createElement('div');
+    box.className = 'slds-box slds-box_x-small slds-m-bottom_x-small ' + (t.includes('+40%') ? 'alert-red' : 'alert-yellow');
+    box.innerHTML = `<p class="msg">${t}</p><button class="slds-button slds-button_neutral slds-m-top_x-small">Discuss with Client</button>`;
+    aList.appendChild(box);
+  });
+
+  // Timestamp (simulate refresh)
+  const ts = new Date();
+  document.title += ' – ' + ts.toLocaleTimeString();
+</script>
+</body>
+</html>
