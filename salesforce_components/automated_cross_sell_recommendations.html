@@ -7,7 +7,8 @@
   <style>
     body{padding:1rem;background:#f3f2f2;}
     .slds-card{margin-bottom:1.5rem;}
-    .mercury-insight { font-size: 0.8rem; color: #3e3e3c; margin-top: 0.25rem; }
+    .mercury-insight { font-size: 0.8rem; color: #3e3e3c; margin-top: 0.25rem; white-space: normal; word-break: break-word; }
+    .cell-wrap-content { white-space: normal; word-break: break-word; }
     .slds-spinner_container {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -107,12 +108,12 @@
         const row = document.createElement('tr');
         row.innerHTML = `
           <td data-label="Client">${r.c}</td>
-          <td data-label="Gap Identified">${r.gap}</td>
-          <td data-label="Mercury Recommendation">
+          <td data-label="Gap Identified" class="cell-wrap-content">${r.gap}</td>
+          <td data-label="Mercury Recommendation" class="cell-wrap-content">
             <strong>${r.mercuryRec}</strong>
             <div class="mercury-insight">${r.mercuryRationale}</div>
           </td>
-          <td data-label="Potential Revenue">${formatRevenue(r.rev)}</td>
+          <td data-label="Potential Revenue" class="cell-wrap-content">${formatRevenue(r.rev)}</td>
           <td data-label="Action"><button class="slds-button slds-button_neutral" onclick="createTask('${r.c}', '${r.mercuryRec}')">Create Advisor Task</button></td>
         `;
         cBody.appendChild(row);
